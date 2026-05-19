@@ -1,9 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import { ConflictException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Role } from './role.entity';
 import { CreateRoleDto } from './dtos/createRole.dto';
 import { Permission } from 'src/permission/permission.entity';
+import { UpdateRoleDto } from './dtos/updateRoleDto';
 
 @Injectable()
 export class RoleService {
@@ -16,6 +17,16 @@ export class RoleService {
   ) {}
 
   async createRole(createRoleDto: CreateRoleDto) {
+    const ifExists = await this.roleRepository.findOne({
+      where: { name: createRoleDto.name },
+    });
+
+    if (ifExists) {
+      throw new ConflictException(
+        `User Role: ${createRoleDto.name} already exists`,
+      );
+    }
+
     const role = this.roleRepository.create({
       name: createRoleDto.name,
       permissions: createRoleDto.permissionIds?.map((id) => ({ id })) ?? [],
@@ -23,4 +34,57 @@ export class RoleService {
 
     return this.roleRepository.save(role);
   }
+
+  async getRole() {
+    const roles = await this.roleRepository.find({
+      order: { id: 'DESC' },
+      relations: ['permissions'],
+    });
+
+    return roles;
+  }
+
+  async getRoleById(id: number) {
+    const role = await this.roleRepository.findOne({
+      where: { id: id },
+      relations: ['permissions'],
+    });
+
+    return role;
+  }
+
+  async updateRole(id: number, updateRoleDto: UpdateRoleDto) {
+    const role = await this.roleRepository.findOne({
+      where: {
+        id: id,
+      },
+    });
+
+    if (!role) {
+      throw new ConflictException(`User Role: ${updateRoleDto.name} Not found`);
+    }
+
+    const updateRole = await this.roleRepository.preload({
+      id: role.id,
+      ...updateRoleDto,
+      permissions: updateRoleDto.permissionIds?.map((id) => ({ id })) ?? [],
+    });
+    console.log(updateRole);
+
+    if (!updateRole) {
+      throw new ConflictException(`Role preload failed`);
+    }
+
+    return await this.roleRepository.save(updateRole);
+  }
+
+  // async deleteRole(id: number, updateRoleDto: UpdateRoleDto) {
+  //   const target = await this.roleRepository.findOne({
+  //     where: { id: id },
+  //   });
+
+  //   if (target) {
+  //     throw new ConflictException('Role Not found!');
+  //   }
+  // }
 }

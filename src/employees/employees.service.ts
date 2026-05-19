@@ -33,6 +33,7 @@ export class EmployeesService {
   async getAllEmployees() {
     return await this.employeesRepository.find({
       relations: ['department_id'],
+      order: { id: 'DESC' },
     });
   }
 
