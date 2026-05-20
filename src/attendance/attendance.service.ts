@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { Between, Repository } from 'typeorm';
 import { Attendance, AttendanceStatus } from './attendance.entity';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -49,7 +49,7 @@ export class AttendanceService {
       const attendance = this.attendanceRepository.create({
         ...attendanceCreateDto,
         employee_id: { id: attendanceCreateDto.employee_id },
-        status: [AttendanceStatus.LATE],
+        status: AttendanceStatus.LATE,
         checkInTime: new Date(),
       });
       return await this.attendanceRepository.save(attendance);
@@ -58,7 +58,7 @@ export class AttendanceService {
     const attendance = this.attendanceRepository.create({
       ...attendanceCreateDto,
       employee_id: { id: attendanceCreateDto.employee_id },
-      status: [AttendanceStatus.PRESENT],
+      status: AttendanceStatus.PRESENT,
       checkInTime: new Date(),
     });
     return await this.attendanceRepository.save(attendance);
@@ -67,14 +67,39 @@ export class AttendanceService {
   async getAllAttendances() {
     return await this.attendanceRepository.find({
       relations: ['employee_id'],
+      order: { id: 'DESC' },
+      select: {
+        id: true,
+        checkInTime: true,
+        checkOutTime: true,
+        employee_id: {
+          id: true,
+        },
+        status: true,
+      },
     });
   }
 
   async getAttendanceById(id: number) {
-    return await this.attendanceRepository.findOne({
-      where: { id },
+    const attendence = await this.attendanceRepository.findOne({
+      where: { id: id },
       relations: ['employee_id'],
+      select: {
+        id: true,
+        checkInTime: true,
+        checkOutTime: true,
+        employee_id: {
+          id: true,
+        },
+        status: true,
+      },
     });
+
+    if (!attendence) {
+      throw new NotFoundException('Attendence Not Found');
+    }
+
+    return attendence;
   }
 
   async monthlyWorkingHour(id: number, month: number, year: number) {

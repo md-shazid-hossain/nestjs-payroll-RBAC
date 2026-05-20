@@ -50,13 +50,13 @@ export class EmployeeCreateDto {
   @IsNumber({}, { message: 'department_id must be a number' })
   department_id!: number;
 
-  @ApiProperty({
-    description: 'Base salary',
-    example: 50000,
-  })
-  @IsNotEmpty({ message: 'base_salary is required' })
-  @IsNumber({}, { message: 'base_salary must be a number' })
-  base_salary!: number;
+  // @ApiProperty({
+  //   description: 'Base salary',
+  //   example: 50000,
+  // })
+  // @IsNotEmpty({ message: 'base_salary is required' })
+  // @IsNumber({}, { message: 'base_salary must be a number' })
+  // base_salary!: number;
 
   @ApiProperty({
     description: 'Active status (true = active, false = inactive)',

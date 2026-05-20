@@ -1,8 +1,13 @@
-import { ConflictException, Injectable } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Employees } from './employees.entity';
 import { EmployeeCreateDto } from './dtos/employeesCreate.dto';
+import { EmployeeUpdateDto } from './dtos/employeeUpdate.dto';
 
 @Injectable()
 export class EmployeesService {
@@ -36,9 +41,23 @@ export class EmployeesService {
   }
 
   async getAllEmployees() {
-    return await this.employeesRepository.find({
+    return this.employeesRepository
+      .createQueryBuilder('employee')
+      .leftJoin('employee.department_id', 'department')
+      .select([
+        'employee.id',
+        'employee.name',
+        'employee.dateOfBirth',
+        'department.id',
+        'department.name',
+      ])
+      .getMany();
+  }
+
+  async getEmployeeById(id: number) {
+    const employee = await this.employeesRepository.findOne({
+      where: { id },
       relations: ['department_id'],
-      order: { id: 'DESC' },
       select: {
         id: true,
         name: true,
@@ -48,16 +67,15 @@ export class EmployeesService {
         },
       },
     });
+
+    if (!employee) {
+      throw new NotFoundException('Employee Not Found');
+    }
+
+    return employee;
   }
 
-  async getEmployeeById(id: number) {
-    return await this.employeesRepository.findOne({
-      where: { id },
-      relations: ['department_id'],
-    });
-  }
-
-  async updateEmployee(id: number, employeesCreateDto: EmployeeCreateDto) {
+  async updateEmployee(id: number, employeeUpdateDto: EmployeeUpdateDto) {
     const employee = await this.employeesRepository.findOne({
       where: { id },
     });
@@ -67,12 +85,12 @@ export class EmployeesService {
     }
 
     const updatedEmployee = this.employeesRepository.merge(employee, {
-      ...employeesCreateDto,
+      ...employeeUpdateDto,
       department_id: {
-        id: employeesCreateDto.department_id,
+        id: employeeUpdateDto.department_id,
       },
       user: {
-        id: employeesCreateDto.user,
+        id: employeeUpdateDto.user,
       },
     });
 

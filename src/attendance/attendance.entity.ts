@@ -24,10 +24,9 @@ export class Attendance {
 
   @Column({
     type: 'enum',
-    array: true,
     enum: AttendanceStatus,
   })
-  status!: AttendanceStatus[];
+  status!: AttendanceStatus;
 
   @Column({ type: 'timestamp', nullable: true })
   checkInTime?: Date;

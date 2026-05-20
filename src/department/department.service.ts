@@ -16,8 +16,6 @@ export class DepartmentService {
   ) {}
 
   async createDepartment(departmentDto: DepartmentDto) {
-    // console.log('Received department DTO:', departmentDto);
-
     const existingDepartment = await this.departmentRepository.findOne({
       where: { name: departmentDto.name },
     });
@@ -35,11 +33,18 @@ export class DepartmentService {
   }
 
   async getAllDepartments() {
-    return this.departmentRepository.find();
+    return this.departmentRepository.find({
+      order: { id: 'DESC' },
+      select: { name: true, id: true },
+    });
   }
 
   async getDepartmentById(id: number) {
-    return this.departmentRepository.findOne({ where: { id } });
+    return this.departmentRepository.findOne({
+      where: { id },
+      order: { id: 'DESC' },
+      select: { name: true, id: true },
+    });
   }
 
   async updateDepartment(id: number, departmentDto: DepartmentDto) {

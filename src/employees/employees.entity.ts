@@ -45,11 +45,11 @@ export class Employees {
   })
   department_id!: Department;
 
-  @Column({
-    type: 'int',
-    nullable: false,
-  })
-  base_salary!: number;
+  // @Column({
+  //   type: 'int',
+  //   nullable: false,
+  // })
+  // base_salary!: number;
 
   @Column({
     type: 'boolean',

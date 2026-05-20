@@ -19,7 +19,9 @@ import {
 } from '@nestjs/swagger';
 
 import { EmployeesService } from './employees.service';
+
 import { EmployeeCreateDto } from './dtos/employeesCreate.dto';
+import { EmployeeUpdateDto } from './dtos/employeeUpdate.dto';
 
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { PermissionsGuard } from 'src/auth/guards/permission.guard';
@@ -119,7 +121,7 @@ export class EmployeesController {
     description: 'Employee ID',
   })
   @ApiBody({
-    type: EmployeeCreateDto,
+    type: EmployeeUpdateDto,
   })
   @ApiResponse({
     status: 200,
@@ -136,9 +138,9 @@ export class EmployeesController {
   })
   async updateEmployee(
     @Param('id', ParseIntPipe) id: number,
-    @Body() employeeCreateDto: EmployeeCreateDto,
+    @Body() employeeUpdateDto: EmployeeUpdateDto,
   ) {
-    return this.employeesService.updateEmployee(id, employeeCreateDto);
+    return this.employeesService.updateEmployee(id, employeeUpdateDto);
   }
 
   // @Delete(':id')
