@@ -1,9 +1,13 @@
-import { ConflictException, Injectable } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Users } from './users.entity';
 import { UpdateUserDto } from './dtos/updateUser.dto';
-
+import * as bcrypt from 'bcrypt';
 @Injectable()
 export class UsersService {
   constructor(
@@ -12,7 +16,25 @@ export class UsersService {
   ) {}
 
   async gatAllUsers() {
-    return await this.usersRepository.find({ relations: ['roles'] });
+    const users = await this.usersRepository.find({
+      relations: ['roles'],
+      select: { email: true, id: true, roles: true },
+    });
+
+    return users;
+  }
+
+  async getuserById(id: number) {
+    const user = await this.usersRepository.findOne({
+      where: { id: id },
+      select: { email: true, id: true, roles: true },
+    });
+
+    if (!user) {
+      throw new NotFoundException('User Not Found');
+    }
+
+    return user;
   }
 
   async updateUsers(id: number, updateUserDto: UpdateUserDto) {
@@ -24,21 +46,35 @@ export class UsersService {
       throw new ConflictException(`User: ${updateUserDto.email} Not found`);
     }
 
-    const updateUser = await this.usersRepository.preload({
-      id: user.id,
-      ...updateUserDto,
-      roles: updateUserDto.roles?.map((id) => ({ id })) ?? [],
-    });
-    // console.log(updateRole);
+    if (updateUserDto.password) {
+      const hashedPassword = await bcrypt.hash(updateUserDto.password, 10);
 
-    if (!updateUser) {
-      throw new ConflictException(`Role preload failed`);
+      const updateUser = await this.usersRepository.preload({
+        id: user.id,
+        ...updateUserDto,
+        roles: updateUserDto.roles?.map((id) => ({ id })) ?? [],
+        password: hashedPassword,
+      });
+
+      if (!updateUser) {
+        throw new ConflictException(`Role preload failed`);
+      }
+
+      // console.log(updateUser);
+
+      return await this.usersRepository.save(updateUser);
+    } else {
+      const updateUser = await this.usersRepository.preload({
+        id: user.id,
+        ...updateUserDto,
+        roles: updateUserDto.roles?.map((id) => ({ id })) ?? [],
+      });
+
+      if (!updateUser) {
+        throw new ConflictException(`Role preload failed`);
+      }
+
+      return await this.usersRepository.save(updateUser);
     }
-
-    return await this.usersRepository.save(updateUser);
   }
-
-  // async singleUser(id: number) {
-  //   await
-  // }
 }

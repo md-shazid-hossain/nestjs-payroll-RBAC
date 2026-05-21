@@ -1,13 +1,13 @@
-import { Employees } from 'src/employees/employees.entity';
+// import { Employees } from 'src/employees/employees.entity';
 import { Role } from 'src/role/role.entity';
 import {
   Column,
   CreateDateColumn,
   Entity,
-  JoinColumn,
+  // JoinColumn,
   JoinTable,
   ManyToMany,
-  OneToOne,
+  // OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -43,9 +43,9 @@ export class Users {
   @JoinTable()
   roles!: Role[];
 
-  @OneToOne(() => Employees, (employee) => employee.user)
-  @JoinColumn()
-  employee!: Employees;
+  // @OneToOne(() => Employees, (employee) => employee.user)
+  // @JoinColumn()
+  // employee!: Employees;
 
   @CreateDateColumn({
     type: 'timestamp',

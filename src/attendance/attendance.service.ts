@@ -65,19 +65,18 @@ export class AttendanceService {
   }
 
   async getAllAttendances() {
-    return await this.attendanceRepository.find({
-      relations: ['employee_id'],
-      order: { id: 'DESC' },
-      select: {
-        id: true,
-        checkInTime: true,
-        checkOutTime: true,
-        employee_id: {
-          id: true,
-        },
-        status: true,
-      },
-    });
+    return await this.attendanceRepository
+      .createQueryBuilder('attendance')
+      .leftJoin('attendance.employee_id', 'employee')
+      .select([
+        'attendance.id',
+        'attendance.checkInTime',
+        'attendance.checkOutTime',
+        'attendance.status',
+        'employee.id',
+      ])
+      .orderBy('attendance.id', 'DESC')
+      .getMany();
   }
 
   async getAttendanceById(id: number) {
@@ -113,7 +112,6 @@ export class AttendanceService {
       },
       relations: ['employee_id'],
     });
-    // console.log(totalAttendance);
     return totalAttendance * 8;
   }
 

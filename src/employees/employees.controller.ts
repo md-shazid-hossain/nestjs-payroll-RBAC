@@ -87,7 +87,7 @@ export class EmployeesController {
   }
 
   @Get(':id')
-  @RequirePermissions('read:employee')
+  @RequirePermissions('read:singleEmployee')
   @ApiOperation({
     summary: 'Get employee by ID',
   })

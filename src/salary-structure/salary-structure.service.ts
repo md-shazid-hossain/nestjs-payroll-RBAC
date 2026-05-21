@@ -37,7 +37,15 @@ export class SalaryStructureService {
   }
 
   async getSalaryStructure() {
-    const data = await this.salaryStructureRepository.find();
+    const data = await this.salaryStructureRepository.find({
+      select: {
+        allowance: true,
+        basicSalary: true,
+        employee_id: true,
+        latePenalty: true,
+        hra: true,
+      },
+    });
 
     return data;
   }

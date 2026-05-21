@@ -18,14 +18,15 @@ export class PermissionsGuard implements CanActivate {
     const request = context.switchToHttp().getRequest();
     const user = request.user;
 
-    // console.log(user);
-
-    const userPermissions = user.roles
-      .flatMap((role) => role.permissions)
-      .map((p) => `${p.action}:${p.subject}`);
+    const userPermissions =
+      user.roles?.flatMap(
+        (role) =>
+          role.permissions?.map((p) => `${p.action}:${p.subject}`) ?? [],
+      ) ?? [];
 
     // console.log(userPermissions);
-
+    // console.log('Required:', requiredPermissions);
+    // console.log('User permissions:', userPermissions);
     return requiredPermissions.every((req) => userPermissions.includes(req));
   }
 }

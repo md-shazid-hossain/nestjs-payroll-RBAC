@@ -4,7 +4,7 @@ import { Payroll } from './payroll.entity';
 import { LessThanOrEqual, MoreThanOrEqual, Repository } from 'typeorm';
 import { SalaryStructure } from 'src/salary-structure/salary-structure.entity';
 import { Attendance, AttendanceStatus } from 'src/attendance/attendance.entity';
-import { ArrayContains, Raw } from 'typeorm';
+import { Raw } from 'typeorm';
 import { Tax } from 'src/tax/tax.entity';
 
 @Injectable()
@@ -31,9 +31,8 @@ export class PayrollService {
       where: {
         employee_id: { id: id },
         //! ArrayContains checks whether a Postgres array column includes the given value(s) in a TypeORM query.
-        status: ArrayContains([
-          AttendanceStatus.LATE || AttendanceStatus.PRESENT,
-        ]),
+        status: AttendanceStatus.LATE || AttendanceStatus.PRESENT,
+
         date: Raw((alias) => `EXTRACT(MONTH FROM ${alias}) = :month`, {
           month,
         }),
@@ -44,7 +43,7 @@ export class PayrollService {
     const totalLateDay = await this.attendenceRepository.count({
       where: {
         employee_id: { id: id },
-        status: ArrayContains([AttendanceStatus.LATE]),
+        status: AttendanceStatus.LATE,
         date: Raw((alias) => `EXTRACT(MONTH FROM ${alias}) = :month`, {
           month,
         }),
@@ -103,10 +102,27 @@ export class PayrollService {
     return await this.payrollRepository.findOne({
       where: { employee: { id: id } },
       order: { createdAt: 'DESC' },
+      relations: ['employee'],
     });
   }
 
   async getAllPayrolls() {
-    return await this.payrollRepository.find();
+    return await this.payrollRepository.find({
+      order: { id: 'DESC' },
+      relations: ['employee'],
+      select: {
+        id: true,
+        deduction: true,
+        gross: true,
+        month: true,
+        net: true,
+        status: true,
+        taxDeduction: true,
+        employee: {
+          id: true,
+          name: true,
+        },
+      },
+    });
   }
 }

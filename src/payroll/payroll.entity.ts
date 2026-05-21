@@ -64,11 +64,10 @@ export class Payroll {
 
   @Column({
     type: 'enum',
-    array: true,
     enum: Status,
     default: [Status.PENDING],
   })
-  status!: Status[];
+  status!: Status;
 
   @CreateDateColumn({
     type: 'timestamp',

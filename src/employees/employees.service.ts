@@ -32,26 +32,43 @@ export class EmployeesService {
       department_id: {
         id: employeesCreateDto.department_id,
       },
-      user: {
-        id: employeesCreateDto.user,
-      },
     });
 
     return await this.employeesRepository.save(newEmployee);
   }
 
+  // async getAllEmployees() {
+  //   return this.employeesRepository
+  //     .createQueryBuilder('employee')
+  //     .leftJoin('employee.department_id', 'department')
+  //     .select([
+  //       'employee.id',
+  //       'employee.name',
+  //       'employee.dateOfBirth',
+  //       'department.id',
+  //       'department.name',
+  //     ])
+  //     .getMany();
+  // }
+
   async getAllEmployees() {
-    return this.employeesRepository
-      .createQueryBuilder('employee')
-      .leftJoin('employee.department_id', 'department')
-      .select([
-        'employee.id',
-        'employee.name',
-        'employee.dateOfBirth',
-        'department.id',
-        'department.name',
-      ])
-      .getMany();
+    return await this.employeesRepository.find({
+      relations: ['department_id'],
+      order: { id: 'DESC' },
+      select: {
+        id: true,
+        name: true,
+        dateOfBirth: true,
+        joiningDate: true,
+        gender: true,
+        phone: true,
+        status: true,
+        department_id: {
+          id: true,
+          name: true,
+        },
+      },
+    });
   }
 
   async getEmployeeById(id: number) {
@@ -61,6 +78,22 @@ export class EmployeesService {
       select: {
         id: true,
         name: true,
+        dateOfBirth: true,
+        joiningDate: true,
+        education: true,
+        email: true,
+        experience: true,
+        mothersName: true,
+        fathersName: true,
+        gender: true,
+        nid: true,
+        phone: true,
+        presentAddress: true,
+        permanentAddress: true,
+        status: true,
+        salaryStructures: {
+          basicSalary: true,
+        },
         department_id: {
           id: true,
           name: true,
@@ -88,9 +121,6 @@ export class EmployeesService {
       ...employeeUpdateDto,
       department_id: {
         id: employeeUpdateDto.department_id,
-      },
-      user: {
-        id: employeeUpdateDto.user,
       },
     });
 

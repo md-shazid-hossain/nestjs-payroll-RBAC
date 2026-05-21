@@ -12,7 +12,7 @@ import { Department } from '../department/department.entity';
 import { Attendance } from 'src/attendance/attendance.entity';
 import { Payroll } from 'src/payroll/payroll.entity';
 import { SalaryStructure } from 'src/salary-structure/salary-structure.entity';
-import { Users } from 'src/users/users.entity';
+// import { Users } from 'src/users/users.entity';
 
 @Entity()
 export class Employees {
@@ -137,8 +137,8 @@ export class Employees {
   )
   salaryStructures!: SalaryStructure;
 
-  @OneToOne(() => Users, (user) => user.employee)
-  user!: Users;
+  // @OneToOne(() => Users, (user) => user.employee)
+  // user!: Users;
 
   constructor() {
     this.joiningDate = new Date();

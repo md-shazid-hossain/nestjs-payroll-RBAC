@@ -28,6 +28,11 @@ export class UsersController {
     return await this.userService.gatAllUsers(); // typo kept as in original
   }
 
+  @Get(':id')
+  async getUserById(@Param('id') id: number) {
+    return await this.userService.getuserById(id);
+  }
+
   @Put(':id')
   @ApiOperation({
     summary: 'Update a user by ID',

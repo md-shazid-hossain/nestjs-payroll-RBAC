@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Holiday } from './holiday.entity';
@@ -32,12 +32,29 @@ export class HolidayService {
     return this.holidayRepository.save(holiday);
   }
 
-  getAllHolidays() {
-    return this.holidayRepository.find();
+  async getAllHolidays() {
+    const holidays = await this.holidayRepository.find({
+      select: { id: true, date: true, name: true, type: true },
+    });
+
+    if (!holidays) {
+      throw new NotFoundException('No Holidays Found!');
+    }
+
+    return holidays;
   }
 
-  getHolidayById(id: number) {
-    return this.holidayRepository.findOneBy({ id });
+  async getHolidayById(id: number) {
+    const holiday = await this.holidayRepository.findOne({
+      where: { id: id },
+      select: { id: true, date: true, name: true, type: true },
+    });
+
+    if (!holiday) {
+      throw new NotFoundException('No Holiday Found!');
+    }
+
+    return holiday;
   }
 
   async updateHoliday(id: number, holidayUpdateDto: HolidayUpdateDto) {

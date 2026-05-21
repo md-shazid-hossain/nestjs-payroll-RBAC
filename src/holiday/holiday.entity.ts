@@ -32,11 +32,11 @@ export class Holiday {
   })
   type?: string;
 
-  @Column({
-    type: 'boolean',
-    nullable: false,
-  })
-  isPaid!: boolean;
+  // @Column({
+  //   type: 'boolean',
+  //   nullable: false,
+  // })
+  // isPaid!: boolean;
 
   @CreateDateColumn({
     type: 'timestamp',
