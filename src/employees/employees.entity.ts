@@ -12,7 +12,6 @@ import { Department } from '../department/department.entity';
 import { Attendance } from 'src/attendance/attendance.entity';
 import { Payroll } from 'src/payroll/payroll.entity';
 import { SalaryStructure } from 'src/salary-structure/salary-structure.entity';
-// import { Users } from 'src/users/users.entity';
 
 @Entity()
 export class Employees {
@@ -44,12 +43,6 @@ export class Employees {
     nullable: false,
   })
   department_id!: Department;
-
-  // @Column({
-  //   type: 'int',
-  //   nullable: false,
-  // })
-  // base_salary!: number;
 
   @Column({
     type: 'boolean',
@@ -125,6 +118,13 @@ export class Employees {
   })
   experience!: string;
 
+  @Column({
+    type: 'date',
+    nullable: true,
+    default: null,
+  })
+  deleteDate!: Date;
+
   @OneToMany(() => Attendance, (attendance) => attendance.employee_id)
   attendance!: Attendance[];
 
@@ -136,9 +136,6 @@ export class Employees {
     (SalaryStructure) => SalaryStructure.employee_id,
   )
   salaryStructures!: SalaryStructure;
-
-  // @OneToOne(() => Users, (user) => user.employee)
-  // user!: Users;
 
   constructor() {
     this.joiningDate = new Date();

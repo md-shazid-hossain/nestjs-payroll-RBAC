@@ -37,15 +37,37 @@ export class TaxService {
   }
 
   async getAllTax() {
-    const data = await this.taxRepository.find();
+    const data = await this.taxRepository.find({
+      select: {
+        id: true,
+        maxSalary: true,
+        minSalary: true,
+        percentage: true,
+      },
+    });
 
+    if (!data) {
+      throw new NotFoundException('No Tax Found');
+    }
     return data;
   }
 
   async getTaxById(id: number) {
-    return await this.taxRepository.findOne({
+    const tax = await this.taxRepository.findOne({
       where: { id },
+      select: {
+        id: true,
+        maxSalary: true,
+        minSalary: true,
+        percentage: true,
+      },
     });
+
+    if (!tax) {
+      throw new NotFoundException('Not Found!');
+    }
+
+    return tax;
   }
 
   async updateTax(id: number, createTaxDto: CreateTaxDto) {

@@ -4,7 +4,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { IsNull, Not, Repository } from 'typeorm';
 import { Employees } from './employees.entity';
 import { EmployeeCreateDto } from './dtos/employeesCreate.dto';
 import { EmployeeUpdateDto } from './dtos/employeeUpdate.dto';
@@ -37,39 +37,54 @@ export class EmployeesService {
     return await this.employeesRepository.save(newEmployee);
   }
 
-  // async getAllEmployees() {
-  //   return this.employeesRepository
-  //     .createQueryBuilder('employee')
-  //     .leftJoin('employee.department_id', 'department')
-  //     .select([
-  //       'employee.id',
-  //       'employee.name',
-  //       'employee.dateOfBirth',
-  //       'department.id',
-  //       'department.name',
-  //     ])
-  //     .getMany();
-  // }
-
   async getAllEmployees() {
-    return await this.employeesRepository.find({
-      relations: ['department_id'],
-      order: { id: 'DESC' },
-      select: {
-        id: true,
-        name: true,
-        dateOfBirth: true,
-        joiningDate: true,
-        gender: true,
-        phone: true,
-        status: true,
-        department_id: {
-          id: true,
-          name: true,
-        },
-      },
-    });
+    return this.employeesRepository
+      .createQueryBuilder('employee')
+      .leftJoin('employee.department_id', 'department')
+      .leftJoin('employee.salaryStructures', 'salaryStructures')
+
+      .select('employee.id', 'id')
+      .addSelect('employee.name', 'name')
+      .addSelect('employee.dateOfBirth', 'dateOfBirth')
+      .addSelect('employee.joiningDate', 'joiningDate')
+      .addSelect('employee.education', 'education')
+      .addSelect('employee.email', 'email')
+      .addSelect('employee.experience', 'experience')
+      .addSelect('employee.mothersName', 'mothersName')
+      .addSelect('employee.fathersName', 'fathersName')
+      .addSelect('employee.gender', 'gender')
+      .addSelect('employee.nid', 'nid')
+      .addSelect('employee.phone', 'phone')
+      .addSelect('employee.presentAddress', 'presentAddress')
+      .addSelect('employee.permanentAddress', 'permanentAddress')
+      .addSelect('employee.status', 'status')
+
+      .addSelect('department.name', 'departmentName')
+
+      .addSelect('salaryStructures.basicSalary', 'basicSalary')
+
+      .getRawMany();
   }
+
+  // async getAllEmployees() {
+  //   return await this.employeesRepository.find({
+  //     relations: ['department_id'],
+  //     order: { id: 'DESC' },
+  //     select: {
+  //       id: true,
+  //       name: true,
+  //       dateOfBirth: true,
+  //       joiningDate: true,
+  //       gender: true,
+  //       phone: true,
+  //       status: true,
+  //       department_id: {
+  //         id: true,
+  //         name: true,
+  //       },
+  //     },
+  //   });
+  // }
 
   async getEmployeeById(id: number) {
     const employee = await this.employeesRepository.findOne({
@@ -127,16 +142,40 @@ export class EmployeesService {
     return await this.employeesRepository.save(updatedEmployee);
   }
 
-  async deleteEmployee(id: number) {
-    const employee = await this.employeesRepository.findOne({
-      where: { id },
+  // async deleteEmployee(id: number) {
+  //   const employee = await this.employeesRepository.findOne({
+  //     where: { id },
+  //   });
+
+  //   if (!employee) {
+  //     return 'employee not found';
+  //   }
+
+  //   await this.employeesRepository.delete(id);
+  //   return 'employee deleted successfully';
+  // }
+
+  async softDelete(id: number) {
+    const targetToDelete = await this.employeesRepository.findOne({
+      where: { id: id, deleteDate: IsNull() },
     });
 
-    if (!employee) {
-      return 'employee not found';
+    if (!targetToDelete) {
+      throw new NotFoundException('Employee Not Found Or Already Deleted!');
     }
 
-    await this.employeesRepository.delete(id);
-    return 'employee deleted successfully';
+    return await this.employeesRepository.update(id, {
+      deleteDate: new Date(),
+    });
+  }
+
+  async getAllDeleted() {
+    const deleted = await this.employeesRepository.find({
+      where: { deleteDate: Not(IsNull()) },
+    });
+
+    console.log(deleted);
+
+    return deleted;
   }
 }

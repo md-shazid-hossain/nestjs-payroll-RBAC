@@ -38,6 +38,6 @@ export class PermissionService {
   }
 
   async getPermissions() {
-    return await this.permissionRepository.find({ relations: ['roles'] });
+    return await this.permissionRepository.find({ order: { id: 'DESC' } });
   }
 }

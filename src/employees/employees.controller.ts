@@ -4,6 +4,7 @@ import {
   Get,
   Param,
   ParseIntPipe,
+  Patch,
   Post,
   Put,
   UseGuards,
@@ -170,4 +171,14 @@ export class EmployeesController {
   // async deleteEmployee(@Param('id', ParseIntPipe) id: number) {
   //   return this.employeesService.deleteEmployee(id);
   // }
+
+  @Patch(':id')
+  async softDelete(@Param('id') id: number) {
+    return this.employeesService.softDelete(id);
+  }
+
+  @Get('deleted-data')
+  async getSoftDeletedData() {
+    await this.employeesService.getAllDeleted();
+  }
 }

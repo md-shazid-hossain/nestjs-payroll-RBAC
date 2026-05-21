@@ -99,11 +99,30 @@ export class PayrollService {
   }
 
   async generatePaySlip(id: number) {
-    return await this.payrollRepository.findOne({
+    const payroll = await this.payrollRepository.findOne({
       where: { employee: { id: id } },
-      order: { createdAt: 'DESC' },
+      order: { id: 'DESC' },
       relations: ['employee'],
+      select: {
+        id: true,
+        deduction: true,
+        gross: true,
+        month: true,
+        net: true,
+        status: true,
+        taxDeduction: true,
+        employee: {
+          id: true,
+          name: true,
+        },
+      },
     });
+
+    if (!payroll) {
+      throw new NotFoundException('Payroll Not Found!');
+    }
+
+    return payroll;
   }
 
   async getAllPayrolls() {
