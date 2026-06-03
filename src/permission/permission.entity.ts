@@ -30,7 +30,7 @@ export class Permission {
   })
   deleteDate!: Date;
 
-  @ManyToOne(() => Users, (user) => user.deletedDepartments, {
+  @ManyToOne(() => Users, (user) => user.deletedPermission, {
     nullable: true,
   })
   deletedBy!: Users;

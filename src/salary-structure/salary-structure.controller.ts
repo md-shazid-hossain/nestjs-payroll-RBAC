@@ -24,12 +24,6 @@ export class SalaryStructureController {
   @ApiResponse({
     status: 201,
     description: 'Salary structure created successfully',
-    schema: {
-      example: {
-        success: true,
-        message: 'Salary structure added for employee ID 1',
-      },
-    },
   })
   @ApiResponse({ status: 400, description: 'Invalid input data' })
   async createSalaryStructure(
@@ -48,18 +42,6 @@ export class SalaryStructureController {
   @ApiResponse({
     status: 200,
     description: 'List of salary structures',
-    schema: {
-      example: [
-        {
-          id: 1,
-          employeeId: 1,
-          baseSalary: 50000,
-          allowances: { hra: 10000, travel: 2000 },
-          deductions: { tax: 5000 },
-          isActive: true,
-        },
-      ],
-    },
   })
   async getSalaryStructures() {
     return await this.salaryStructureService.getSalaryStructure();
@@ -82,6 +64,11 @@ export class SalaryStructureController {
       id,
       updateSalaryStructureDto,
     );
+  }
+
+  @Get(':id')
+  async getSingleSalaryStructure(@Param('id') id: number) {
+    return await this.salaryStructureService.getSingleSalaryStructure(id);
   }
 
   @Patch(':id')

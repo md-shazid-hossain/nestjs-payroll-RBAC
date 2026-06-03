@@ -49,13 +49,35 @@ export class SalaryStructureService {
         id: true,
         allowance: true,
         basicSalary: true,
-        employee_id: true,
+        employee_id: {
+          name: true,
+        },
         latePenalty: true,
         hra: true,
       },
+      relations: ['employee_id'],
     });
 
     return data;
+  }
+
+  async getSingleSalaryStructure(id: number) {
+    const singleSalaryStructure = await this.salaryStructureRepository.findOne({
+      where: { id: id },
+      select: {
+        id: true,
+        allowance: true,
+        basicSalary: true,
+        employee_id: {
+          name: true,
+        },
+        latePenalty: true,
+        hra: true,
+      },
+      relations: ['employee_id'],
+    });
+
+    return singleSalaryStructure;
   }
 
   async updateSalaryStructure(

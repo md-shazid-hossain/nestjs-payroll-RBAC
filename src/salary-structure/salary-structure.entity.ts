@@ -65,7 +65,7 @@ export class SalaryStructure {
   })
   updatedAt!: Date;
 
-  // for soft delete
+  //! for soft delete
   @Column({
     type: 'date',
     nullable: true,
@@ -73,7 +73,7 @@ export class SalaryStructure {
   })
   deleteDate!: Date;
 
-  @ManyToOne(() => Users, (user) => user.deletedDepartments, {
+  @ManyToOne(() => Users, (user) => user.deletedSalaryStructure, {
     nullable: true,
   })
   deletedBy!: Users;

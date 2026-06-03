@@ -5,6 +5,7 @@ import {
   Entity,
   JoinTable,
   ManyToMany,
+  ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 
@@ -29,4 +30,17 @@ export class Role {
     default: null,
   })
   deleteDate!: Date;
+
+  @ManyToOne(() => Users, (user) => user.deletedRole, {
+    nullable: true,
+  })
+  deletedBy!: Users;
+
+  @Column({
+    type: 'varchar',
+    nullable: true,
+    length: 100,
+    unique: true,
+  })
+  delete_reason!: string;
 }

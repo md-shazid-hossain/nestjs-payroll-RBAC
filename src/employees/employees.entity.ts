@@ -156,7 +156,7 @@ export class Employees {
   })
   deleteDate!: Date;
 
-  @ManyToOne(() => Users, (user) => user.deletedDepartments, {
+  @ManyToOne(() => Users, (user) => user.deletedEmployee, {
     nullable: true,
   })
   deletedBy!: Users;
