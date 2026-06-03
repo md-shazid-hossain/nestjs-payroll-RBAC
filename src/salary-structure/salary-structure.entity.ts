@@ -3,11 +3,13 @@ import {
   CreateDateColumn,
   Entity,
   JoinColumn,
+  ManyToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 import { OneToOne } from 'typeorm';
 import { Employees } from '../employees/employees.entity';
+import { Users } from 'src/users/users.entity';
 
 @Entity()
 export class SalaryStructure {
@@ -50,13 +52,6 @@ export class SalaryStructure {
   })
   allowance!: number;
 
-  @Column({
-    type: 'date',
-    nullable: true,
-    default: null,
-  })
-  deleteDate!: Date;
-
   @CreateDateColumn({
     type: 'timestamp',
     default: () => 'CURRENT_TIMESTAMP(6)',
@@ -69,4 +64,25 @@ export class SalaryStructure {
     onUpdate: 'CURRENT_TIMESTAMP(6)',
   })
   updatedAt!: Date;
+
+  // for soft delete
+  @Column({
+    type: 'date',
+    nullable: true,
+    default: null,
+  })
+  deleteDate!: Date;
+
+  @ManyToOne(() => Users, (user) => user.deletedDepartments, {
+    nullable: true,
+  })
+  deletedBy!: Users;
+
+  @Column({
+    type: 'varchar',
+    nullable: true,
+    length: 100,
+    unique: true,
+  })
+  delete_reason!: string;
 }

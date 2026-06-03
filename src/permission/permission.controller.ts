@@ -31,6 +31,11 @@ export class PermissionController {
     return await this.permissionService.getPermissions();
   }
 
+  @Get(':id')
+  async getPermissionById(@Param('id') id: number) {
+    return await this.permissionService.singlePermission(id);
+  }
+
   @Patch(':id')
   @ApiOperation({ summary: 'Soft delete a permission by ID' })
   @ApiParam({ name: 'id', description: 'Permission ID', type: Number })

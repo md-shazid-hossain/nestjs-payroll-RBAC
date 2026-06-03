@@ -8,6 +8,7 @@ import { IsNull, Not, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateSalaryStructureDto } from './dtos/createSalaryStructure.dto';
 import { UpdateSalaryStructureDto } from './dtos/updateSalaryStructure.dto';
+import { SoftDeleteSalaryStructure } from './dtos/softDeleteSalaryStructure.dto';
 
 @Injectable()
 export class SalaryStructureService {
@@ -75,7 +76,10 @@ export class SalaryStructureService {
     );
   }
 
-  async softDeleteSalaryStructure(id: number) {
+  async softDeleteSalaryStructure(
+    id: number,
+    softDeleteSalaryStructureDto: SoftDeleteSalaryStructure,
+  ) {
     const targetToDelete = await this.salaryStructureRepository.findOne({
       where: { id: id },
     });
@@ -86,12 +90,15 @@ export class SalaryStructureService {
 
     return await this.salaryStructureRepository.update(id, {
       deleteDate: new Date(),
+      delete_reason: softDeleteSalaryStructureDto.delete_reason,
+      deletedBy: { id: softDeleteSalaryStructureDto.deletedBy },
     });
   }
 
   async getSoftDeletedSalaryStructure() {
     const data = await this.salaryStructureRepository.find({
       where: { deleteDate: Not(IsNull()) },
+      order: { id: 'DESC' },
     });
 
     return data;

@@ -43,10 +43,26 @@ export class PermissionService {
   }
 
   async getPermissions() {
-    return await this.permissionRepository.find({
+    const data = await this.permissionRepository.find({
       where: { deleteDate: IsNull() },
       order: { id: 'DESC' },
     });
+
+    if (!data) {
+      throw new NotFoundException('Permission Not Found!');
+    }
+
+    return data;
+  }
+
+  async singlePermission(id: number) {
+    const data = await this.permissionRepository.findOne({ where: { id: id } });
+
+    if (!data) {
+      throw new NotFoundException('Permission Not Found');
+    }
+
+    return data;
   }
 
   async softDeletePermission(
