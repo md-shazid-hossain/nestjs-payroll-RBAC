@@ -8,6 +8,7 @@ import { IsNull, Not, Repository } from 'typeorm';
 import { Permission } from './permission.entity';
 import { Role } from 'src/role/role.entity';
 import { CreatePermissionDto } from './dtos/createPermission.dto';
+import { SoftDeletePermissionDto } from './dtos/softDeletePermisssion.dto';
 
 @Injectable()
 export class PermissionService {
@@ -42,10 +43,16 @@ export class PermissionService {
   }
 
   async getPermissions() {
-    return await this.permissionRepository.find({ order: { id: 'DESC' } });
+    return await this.permissionRepository.find({
+      where: { deleteDate: IsNull() },
+      order: { id: 'DESC' },
+    });
   }
 
-  async softDeletePermission(id: number) {
+  async softDeletePermission(
+    id: number,
+    softDeletePermissionDto: SoftDeletePermissionDto,
+  ) {
     const targetToDelete = await this.permissionRepository.find({
       where: { id: id },
     });
@@ -56,6 +63,8 @@ export class PermissionService {
 
     return await this.permissionRepository.update(id, {
       deleteDate: new Date(),
+      deletedBy: { id: softDeletePermissionDto.deletedBy },
+      delete_reason: softDeletePermissionDto.delete_reason,
     });
   }
 

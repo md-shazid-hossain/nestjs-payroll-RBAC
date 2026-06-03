@@ -1,5 +1,12 @@
 import { Role } from 'src/role/role.entity';
-import { Column, Entity, ManyToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Users } from 'src/users/users.entity';
+import {
+  Column,
+  Entity,
+  ManyToMany,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 
 @Entity()
 export class Permission {
@@ -22,4 +29,17 @@ export class Permission {
     default: null,
   })
   deleteDate!: Date;
+
+  @ManyToOne(() => Users, (user) => user.deletedDepartments, {
+    nullable: true,
+  })
+  deletedBy!: Users;
+
+  @Column({
+    type: 'varchar',
+    nullable: true,
+    length: 100,
+    unique: true,
+  })
+  delete_reason!: string;
 }

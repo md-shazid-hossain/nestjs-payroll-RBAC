@@ -75,14 +75,15 @@ export class TaxService {
     });
 
     if (!tax) {
-      throw new NotFoundException('Employee Does not exists');
+      throw new NotFoundException('Tax Does not exists');
     }
 
-    tax.maxSalary = createTaxDto.maxSalary;
-    tax.minSalary = createTaxDto.minSalary;
-    tax.percentage = createTaxDto.percentage;
+    await this.taxRepository.update(id, createTaxDto);
 
-    return await this.taxRepository.save(tax);
+    return {
+      success: true,
+      message: 'Tax updated successfully!',
+    };
   }
 
   async deleteTax(id: number) {
