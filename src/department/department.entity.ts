@@ -39,7 +39,7 @@ export class Department {
   })
   updatedAt!: Date;
 
-  // for soft delete
+  //! for soft delete
   @Column({
     type: 'date',
     nullable: true,

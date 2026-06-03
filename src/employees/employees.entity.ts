@@ -12,6 +12,7 @@ import { Department } from '../department/department.entity';
 import { Attendance } from 'src/attendance/attendance.entity';
 import { Payroll } from 'src/payroll/payroll.entity';
 import { SalaryStructure } from 'src/salary-structure/salary-structure.entity';
+import { Users } from 'src/users/users.entity';
 
 @Entity()
 export class Employees {
@@ -118,13 +119,6 @@ export class Employees {
   })
   experience!: string;
 
-  @Column({
-    type: 'date',
-    nullable: true,
-    default: null,
-  })
-  deleteDate!: Date;
-
   @OneToMany(() => Attendance, (attendance) => attendance.employee_id)
   attendance!: Attendance[];
 
@@ -153,4 +147,25 @@ export class Employees {
     onUpdate: 'CURRENT_TIMESTAMP(6)',
   })
   updatedAt!: Date;
+
+  //! columns for soft delete
+  @Column({
+    type: 'date',
+    nullable: true,
+    default: null,
+  })
+  deleteDate!: Date;
+
+  @ManyToOne(() => Users, (user) => user.deletedDepartments, {
+    nullable: true,
+  })
+  deletedBy!: Users;
+
+  @Column({
+    type: 'varchar',
+    nullable: true,
+    length: 100,
+    unique: true,
+  })
+  delete_reason!: string;
 }

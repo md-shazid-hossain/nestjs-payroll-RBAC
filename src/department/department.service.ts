@@ -66,17 +66,13 @@ export class DepartmentService {
     softdeleteDepartmentDto: SoftDeleteDepartmentDto,
   ) {
     const department = await this.departmentRepository.findOne({
-      where: { id },
+      where: { id: id, deleteDate: IsNull() },
     });
 
     if (!department) {
       throw new NotFoundException('Department not found');
     }
-    console.log(id, {
-      deleteDate: new Date(),
-      delete_reason: softdeleteDepartmentDto.delete_reason,
-      deletedBy: { id: softdeleteDepartmentDto.deletedBy },
-    });
+
     await this.departmentRepository.update(id, {
       deleteDate: new Date(),
       delete_reason: softdeleteDepartmentDto.delete_reason,

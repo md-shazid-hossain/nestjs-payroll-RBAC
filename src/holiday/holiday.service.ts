@@ -58,12 +58,14 @@ export class HolidayService {
   }
 
   async updateHoliday(id: number, holidayUpdateDto: HolidayUpdateDto) {
-    const holiday = await this.holidayRepository.findOneBy({ id });
+    const holiday = await this.holidayRepository.findOne({ where: { id: id } });
     if (!holiday) {
       throw new Error('Holiday not found');
     }
-    Object.assign(holiday, holidayUpdateDto);
-    return this.holidayRepository.save(holiday);
+
+    await this.holidayRepository.update(id, holidayUpdateDto);
+
+    return { success: true, message: 'Holiday updated successfully!' };
   }
 
   async deleteHoliday(id: number) {

@@ -32,12 +32,6 @@ export class Holiday {
   })
   type?: string;
 
-  // @Column({
-  //   type: 'boolean',
-  //   nullable: false,
-  // })
-  // isPaid!: boolean;
-
   @CreateDateColumn({
     type: 'timestamp',
     default: () => 'CURRENT_TIMESTAMP(6)',

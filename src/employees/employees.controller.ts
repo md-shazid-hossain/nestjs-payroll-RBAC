@@ -27,6 +27,7 @@ import { EmployeeUpdateDto } from './dtos/employeeUpdate.dto';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { PermissionsGuard } from 'src/auth/guards/permission.guard';
 import { RequirePermissions } from 'src/auth/decorators/permission.decorator';
+import { SoftDeleteEmployeeDto } from './dtos/SoftDeleteEmployeeDto';
 
 @ApiTags('Employees')
 @ApiBearerAuth()
@@ -178,7 +179,10 @@ export class EmployeesController {
   // }
 
   @Patch(':id')
-  async softDelete(@Param('id') id: number) {
-    return this.employeesService.softDelete(id);
+  async softDelete(
+    @Param('id') id: number,
+    @Body() softDeleteEmployeeDto: SoftDeleteEmployeeDto,
+  ) {
+    return this.employeesService.softDelete(id, softDeleteEmployeeDto);
   }
 }

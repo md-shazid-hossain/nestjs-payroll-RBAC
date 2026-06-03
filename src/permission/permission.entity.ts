@@ -15,6 +15,7 @@ export class Permission {
   @ManyToMany(() => Role, (role) => role.permissions)
   roles!: Role[];
 
+  //! for soft delete
   @Column({
     type: 'date',
     nullable: true,

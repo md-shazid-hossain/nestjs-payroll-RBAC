@@ -8,6 +8,7 @@ import { IsNull, Not, Repository } from 'typeorm';
 import { Employees } from './employees.entity';
 import { EmployeeCreateDto } from './dtos/employeesCreate.dto';
 import { EmployeeUpdateDto } from './dtos/employeeUpdate.dto';
+import { SoftDeleteEmployeeDto } from './dtos/SoftDeleteEmployeeDto';
 
 @Injectable()
 export class EmployeesService {
@@ -155,7 +156,7 @@ export class EmployeesService {
   //   return 'employee deleted successfully';
   // }
 
-  async softDelete(id: number) {
+  async softDelete(id: number, softDeleteEmployeeDto: SoftDeleteEmployeeDto) {
     const targetToDelete = await this.employeesRepository.findOne({
       where: { id: id, deleteDate: IsNull() },
     });
@@ -166,6 +167,8 @@ export class EmployeesService {
 
     return await this.employeesRepository.update(id, {
       deleteDate: new Date(),
+      delete_reason: softDeleteEmployeeDto.delete_reason,
+      deletedBy: { id: softDeleteEmployeeDto.deletedBy },
     });
   }
 
