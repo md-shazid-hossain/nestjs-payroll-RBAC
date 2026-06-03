@@ -26,18 +26,6 @@ export class Department {
   @OneToMany(() => Employees, (employee) => employee.department_id)
   employees!: Employees[];
 
-  @Column({
-    type: 'date',
-    nullable: true,
-    default: null,
-  })
-  deleteDate!: Date;
-
-  @ManyToOne(() => Users, (user) => user.deletedEmployees, {
-    nullable: true,
-  })
-  deletedBy!: Users;
-
   @CreateDateColumn({
     type: 'timestamp',
     default: () => 'CURRENT_TIMESTAMP(6)',
@@ -50,4 +38,25 @@ export class Department {
     onUpdate: 'CURRENT_TIMESTAMP(6)',
   })
   updatedAt!: Date;
+
+  // for soft delete
+  @Column({
+    type: 'date',
+    nullable: true,
+    default: null,
+  })
+  deleteDate!: Date;
+
+  @ManyToOne(() => Users, (user) => user.deletedDepartments, {
+    nullable: true,
+  })
+  deletedBy!: Users;
+
+  @Column({
+    type: 'varchar',
+    nullable: true,
+    length: 100,
+    unique: true,
+  })
+  delete_reason!: string;
 }

@@ -7,6 +7,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Department } from './department.entity';
 import { IsNull, Not, Repository } from 'typeorm';
 import { DepartmentDto } from './dtos/department.dto';
+import { SoftDeleteDepartmentDto } from './dtos/SoftDeleteDepartmentDto';
 
 @Injectable()
 export class DepartmentService {
@@ -34,6 +35,7 @@ export class DepartmentService {
 
   async getAllDepartments() {
     return this.departmentRepository.find({
+      where: { deleteDate: IsNull() },
       order: { id: 'DESC' },
       select: { name: true, id: true, employees: true },
       relations: ['employees'],
@@ -59,18 +61,29 @@ export class DepartmentService {
     return this.departmentRepository.save(department);
   }
 
-  async softDeleteDepartment(id: number) {
-    const targetToDelete = await this.departmentRepository.findOne({
-      where: { id: id },
+  async softDeleteDepartment(
+    id: number,
+    softdeleteDepartmentDto: SoftDeleteDepartmentDto,
+  ) {
+    const department = await this.departmentRepository.findOne({
+      where: { id },
     });
 
-    if (!targetToDelete) {
+    if (!department) {
       throw new NotFoundException('Department not found');
     }
-
-    return await this.departmentRepository.update(id, {
+    console.log(id, {
       deleteDate: new Date(),
+      delete_reason: softdeleteDepartmentDto.delete_reason,
+      deletedBy: { id: softdeleteDepartmentDto.deletedBy },
     });
+    await this.departmentRepository.update(id, {
+      deleteDate: new Date(),
+      delete_reason: softdeleteDepartmentDto.delete_reason,
+      deletedBy: { id: softdeleteDepartmentDto.deletedBy },
+    });
+
+    return { success: true, message: 'Department deleted successfully' };
   }
 
   async getSoftDeleatedDepartments() {

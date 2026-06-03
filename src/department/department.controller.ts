@@ -18,12 +18,13 @@ import {
 
 import { DepartmentService } from './department.service';
 import { DepartmentDto } from './dtos/department.dto';
+import { SoftDeleteDepartmentDto } from './dtos/SoftDeleteDepartmentDto';
 
 @ApiTags('Department')
 @Controller('department')
 export class DepartmentController {
   constructor(private departmentService: DepartmentService) {}
-
+  //! soft delete department
   @Patch(':id')
   @ApiOperation({ summary: 'Soft delete a department' })
   @ApiParam({
@@ -40,11 +41,17 @@ export class DepartmentController {
     status: 404,
     description: 'Department not found',
   })
-  async softDeleteDepartment(@Param('id') id: number) {
-    return this.departmentService.softDeleteDepartment(id);
+  async softDeleteDepartment(
+    @Param('id') id: number,
+    @Body() softdeleteDepartmentDto: SoftDeleteDepartmentDto,
+  ) {
+    return this.departmentService.softDeleteDepartment(
+      id,
+      softdeleteDepartmentDto,
+    );
   }
 
-  @Get('deleted')
+  @Get('deleted-data')
   @ApiOperation({ summary: 'Get all soft-deleted departments' })
   @ApiResponse({
     status: 200,

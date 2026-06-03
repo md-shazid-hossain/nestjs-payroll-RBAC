@@ -64,5 +64,5 @@ export class Users {
 
   // for soft delete
   @OneToMany(() => Department, (department) => department.deletedBy)
-  deletedEmployees!: Department[];
+  deletedDepartments!: Department[];
 }
