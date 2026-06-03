@@ -1,5 +1,4 @@
 import {
-  BadRequestException,
   ConflictException,
   Injectable,
   NotFoundException,
@@ -64,7 +63,7 @@ export class TaxService {
     });
 
     if (!tax) {
-      throw new NotFoundException('Not Found!');
+      throw new NotFoundException('TAX Not Found!');
     }
 
     return tax;
@@ -87,15 +86,13 @@ export class TaxService {
   }
 
   async deleteTax(id: number) {
-    if (!id) {
-      throw new BadRequestException('Invalid ID');
+    const tax = await this.taxRepository.findOne({ where: { id: id } });
+
+    if (!tax) {
+      throw new NotFoundException('Tax not found');
     }
 
-    const result = await this.taxRepository.delete(id);
-
-    if (result.affected === 0) {
-      throw new NotFoundException('Item not found');
-    }
+    await this.taxRepository.delete(id);
 
     return {
       success: true,

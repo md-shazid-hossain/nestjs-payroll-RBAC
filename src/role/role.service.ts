@@ -1,6 +1,10 @@
-import { ConflictException, Injectable } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { IsNull, Not, Repository } from 'typeorm';
 import { Role } from './role.entity';
 import { CreateRoleDto } from './dtos/createRole.dto';
 import { Permission } from 'src/permission/permission.entity';
@@ -76,6 +80,29 @@ export class RoleService {
     }
 
     return await this.roleRepository.save(updateRole);
+  }
+
+  async softDeleteRole(id: number) {
+    const targetToDelete = await this.roleRepository.find({
+      where: { id: id },
+    });
+
+    if (!targetToDelete) {
+      throw new NotFoundException('Role not found!');
+    }
+
+    return await this.roleRepository.update(id, {
+      deleteDate: new Date(),
+    });
+  }
+
+  async getSoftDeletedRoles() {
+    const data = await this.roleRepository.find({
+      where: { deleteDate: Not(IsNull()) },
+      order: { id: 'DESC' },
+    });
+
+    return data;
   }
 
   // async deleteRole(id: number, updateRoleDto: UpdateRoleDto) {

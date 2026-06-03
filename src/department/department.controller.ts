@@ -6,6 +6,7 @@ import {
   Get,
   Body,
   Param,
+  Patch,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -23,6 +24,35 @@ import { DepartmentDto } from './dtos/department.dto';
 export class DepartmentController {
   constructor(private departmentService: DepartmentService) {}
 
+  @Patch(':id')
+  @ApiOperation({ summary: 'Soft delete a department' })
+  @ApiParam({
+    name: 'id',
+    type: Number,
+    description: 'Department ID',
+    example: 1,
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Department soft deleted successfully',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Department not found',
+  })
+  async softDeleteDepartment(@Param('id') id: number) {
+    return this.departmentService.softDeleteDepartment(id);
+  }
+
+  @Get('deleted')
+  @ApiOperation({ summary: 'Get all soft-deleted departments' })
+  @ApiResponse({
+    status: 200,
+    description: 'List of soft-deleted departments',
+  })
+  async getDeleted() {
+    return this.departmentService.getSoftDeleatedDepartments();
+  }
   @Post()
   @ApiOperation({ summary: 'Create a new department' })
   @ApiBody({ type: DepartmentDto })

@@ -1,7 +1,11 @@
+import { Employees } from 'src/employees/employees.entity';
+import { Users } from 'src/users/users.entity';
 import {
   Column,
   CreateDateColumn,
   Entity,
+  ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -18,6 +22,21 @@ export class Department {
     unique: true,
   })
   name!: string;
+
+  @OneToMany(() => Employees, (employee) => employee.department_id)
+  employees!: Employees[];
+
+  @Column({
+    type: 'date',
+    nullable: true,
+    default: null,
+  })
+  deleteDate!: Date;
+
+  @ManyToOne(() => Users, (user) => user.deletedEmployees, {
+    nullable: true,
+  })
+  deletedBy!: Users;
 
   @CreateDateColumn({
     type: 'timestamp',

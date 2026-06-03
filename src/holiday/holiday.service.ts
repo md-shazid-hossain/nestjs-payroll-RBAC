@@ -69,8 +69,13 @@ export class HolidayService {
   async deleteHoliday(id: number) {
     const holiday = await this.holidayRepository.findOneBy({ id });
     if (!holiday) {
-      throw new Error('Holiday not found');
+      throw new NotFoundException('Holiday not found');
     }
-    return this.holidayRepository.remove(holiday);
+    await this.holidayRepository.delete(id);
+
+    return {
+      success: true,
+      message: 'Holiday Deleted successfully!',
+    };
   }
 }

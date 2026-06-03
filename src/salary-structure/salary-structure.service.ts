@@ -1,8 +1,13 @@
-import { ConflictException, Injectable } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { SalaryStructure } from './salary-structure.entity';
-import { Repository } from 'typeorm';
+import { IsNull, Not, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateSalaryStructureDto } from './dtos/createSalaryStructure.dto';
+import { UpdateSalaryStructureDto } from './dtos/updateSalaryStructure.dto';
 
 @Injectable()
 export class SalaryStructureService {
@@ -20,6 +25,7 @@ export class SalaryStructureService {
           employee_id: {
             id: createSalaryStructureDto.employeeId,
           },
+          deleteDate: IsNull(),
         },
       });
 
@@ -39,12 +45,53 @@ export class SalaryStructureService {
   async getSalaryStructure() {
     const data = await this.salaryStructureRepository.find({
       select: {
+        id: true,
         allowance: true,
         basicSalary: true,
         employee_id: true,
         latePenalty: true,
         hra: true,
       },
+    });
+
+    return data;
+  }
+
+  async updateSalaryStructure(
+    id: number,
+    updateSalaryStructureDto: UpdateSalaryStructureDto,
+  ) {
+    const findSalaryStructure = await this.salaryStructureRepository.findOne({
+      where: { id: id },
+    });
+
+    if (!findSalaryStructure) {
+      throw new NotFoundException('Salary Structure Not Found!');
+    }
+
+    return await this.salaryStructureRepository.update(
+      id,
+      updateSalaryStructureDto,
+    );
+  }
+
+  async softDeleteSalaryStructure(id: number) {
+    const targetToDelete = await this.salaryStructureRepository.findOne({
+      where: { id: id },
+    });
+
+    if (!targetToDelete) {
+      throw new NotFoundException('Salary Structure not found');
+    }
+
+    return await this.salaryStructureRepository.update(id, {
+      deleteDate: new Date(),
+    });
+  }
+
+  async getSoftDeletedSalaryStructure() {
+    const data = await this.salaryStructureRepository.find({
+      where: { deleteDate: Not(IsNull()) },
     });
 
     return data;

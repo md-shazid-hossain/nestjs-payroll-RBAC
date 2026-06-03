@@ -14,4 +14,11 @@ export class Permission {
 
   @ManyToMany(() => Role, (role) => role.permissions)
   roles!: Role[];
+
+  @Column({
+    type: 'date',
+    nullable: true,
+    default: null,
+  })
+  deleteDate!: Date;
 }

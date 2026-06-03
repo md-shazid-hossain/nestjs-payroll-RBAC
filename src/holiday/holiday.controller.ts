@@ -1,4 +1,12 @@
-import { Body, Controller, Get, Post, Put, Param } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Post,
+  Put,
+  Param,
+  Delete,
+} from '@nestjs/common';
 
 import {
   ApiTags,
@@ -79,5 +87,10 @@ export class HolidayController {
     @Body() holidayUpdateDto: HolidayUpdateDto,
   ) {
     return this.holidayService.updateHoliday(id, holidayUpdateDto);
+  }
+
+  @Delete(':id')
+  async deleteHolyday(@Param('id') id: number) {
+    return await this.holidayService.deleteHoliday(id);
   }
 }

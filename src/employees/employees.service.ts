@@ -169,13 +169,17 @@ export class EmployeesService {
     });
   }
 
-  async getAllDeleted() {
+  async getDeletedData() {
     const deleted = await this.employeesRepository.find({
       where: { deleteDate: Not(IsNull()) },
     });
 
-    console.log(deleted);
+    // console.log(deleted);
 
     return deleted;
   }
+
+  // async getDeletedData() {
+  //   const data = await this.employeesRepository.createQueryBuilder('')
+  // }
 }

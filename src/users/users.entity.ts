@@ -1,4 +1,5 @@
 // import { Employees } from 'src/employees/employees.entity';
+import { Department } from 'src/department/department.entity';
 import { Role } from 'src/role/role.entity';
 import {
   Column,
@@ -7,6 +8,7 @@ import {
   // JoinColumn,
   JoinTable,
   ManyToMany,
+  OneToMany,
   // OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
@@ -59,4 +61,8 @@ export class Users {
     onUpdate: 'CURRENT_TIMESTAMP(6)',
   })
   updatedAt!: Date;
+
+  // for soft delete
+  @OneToMany(() => Department, (department) => department.deletedBy)
+  deletedEmployees!: Department[];
 }

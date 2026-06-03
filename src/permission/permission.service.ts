@@ -1,6 +1,10 @@
-import { ConflictException, Injectable } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { IsNull, Not, Repository } from 'typeorm';
 import { Permission } from './permission.entity';
 import { Role } from 'src/role/role.entity';
 import { CreatePermissionDto } from './dtos/createPermission.dto';
@@ -39,5 +43,28 @@ export class PermissionService {
 
   async getPermissions() {
     return await this.permissionRepository.find({ order: { id: 'DESC' } });
+  }
+
+  async softDeletePermission(id: number) {
+    const targetToDelete = await this.permissionRepository.find({
+      where: { id: id },
+    });
+
+    if (!targetToDelete) {
+      throw new NotFoundException('department not found!');
+    }
+
+    return await this.permissionRepository.update(id, {
+      deleteDate: new Date(),
+    });
+  }
+
+  async getAllSoftDeletedPermission() {
+    const data = await this.permissionRepository.find({
+      where: { deleteDate: Not(IsNull()) },
+      order: { id: 'DESC' },
+    });
+
+    return data;
   }
 }

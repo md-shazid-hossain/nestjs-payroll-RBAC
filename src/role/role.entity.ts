@@ -22,4 +22,11 @@ export class Role {
 
   @ManyToMany(() => Users, (user) => user.roles)
   users!: Users[];
+
+  @Column({
+    type: 'date',
+    nullable: true,
+    default: null,
+  })
+  deleteDate!: Date;
 }

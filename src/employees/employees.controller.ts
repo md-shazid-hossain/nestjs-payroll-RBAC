@@ -87,6 +87,11 @@ export class EmployeesController {
     return this.employeesService.getAllEmployees();
   }
 
+  @Get('deleted-data')
+  async getSoftDeletedData() {
+    return await this.employeesService.getDeletedData();
+  }
+
   @Get(':id')
   @RequirePermissions('read:singleEmployee')
   @ApiOperation({
@@ -175,10 +180,5 @@ export class EmployeesController {
   @Patch(':id')
   async softDelete(@Param('id') id: number) {
     return this.employeesService.softDelete(id);
-  }
-
-  @Get('deleted-data')
-  async getSoftDeletedData() {
-    await this.employeesService.getAllDeleted();
   }
 }

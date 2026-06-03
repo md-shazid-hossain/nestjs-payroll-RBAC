@@ -50,6 +50,13 @@ export class SalaryStructure {
   })
   allowance!: number;
 
+  @Column({
+    type: 'date',
+    nullable: true,
+    default: null,
+  })
+  deleteDate!: Date;
+
   @CreateDateColumn({
     type: 'timestamp',
     default: () => 'CURRENT_TIMESTAMP(6)',

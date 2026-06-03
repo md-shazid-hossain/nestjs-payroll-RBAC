@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Department } from './department.entity';
-import { Repository } from 'typeorm';
+import { IsNull, Not, Repository } from 'typeorm';
 import { DepartmentDto } from './dtos/department.dto';
 
 @Injectable()
@@ -35,7 +35,8 @@ export class DepartmentService {
   async getAllDepartments() {
     return this.departmentRepository.find({
       order: { id: 'DESC' },
-      select: { name: true, id: true },
+      select: { name: true, id: true, employees: true },
+      relations: ['employees'],
     });
   }
 
@@ -56,6 +57,28 @@ export class DepartmentService {
     }
     department.name = departmentDto.name;
     return this.departmentRepository.save(department);
+  }
+
+  async softDeleteDepartment(id: number) {
+    const targetToDelete = await this.departmentRepository.findOne({
+      where: { id: id },
+    });
+
+    if (!targetToDelete) {
+      throw new NotFoundException('Department not found');
+    }
+
+    return await this.departmentRepository.update(id, {
+      deleteDate: new Date(),
+    });
+  }
+
+  async getSoftDeleatedDepartments() {
+    const deleted = await this.departmentRepository.find({
+      where: { deleteDate: Not(IsNull()) },
+    });
+
+    return deleted;
   }
 
   // async deleteDepartment(id: number) {
