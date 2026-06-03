@@ -74,6 +74,10 @@ export class PermissionService {
       order: { id: 'DESC' },
     });
 
+    if (!data) {
+      throw new NotFoundException('No Data Found!');
+    }
+
     return data;
   }
 }
