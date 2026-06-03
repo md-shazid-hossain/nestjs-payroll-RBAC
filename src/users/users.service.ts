@@ -15,7 +15,7 @@ export class UsersService {
     private usersRepository: Repository<Users>,
   ) {}
 
-  async gatAllUsers() {
+  async getAllUsers() {
     const users = await this.usersRepository.find({
       relations: ['roles'],
       select: { email: true, id: true, roles: true },
@@ -24,7 +24,7 @@ export class UsersService {
     return users;
   }
 
-  async getuserById(id: number) {
+  async getUserById(id: number) {
     const user = await this.usersRepository.findOne({
       where: { id: id },
       select: { email: true, id: true, roles: true },
@@ -37,7 +37,7 @@ export class UsersService {
     return user;
   }
 
-  async updateUsers(id: number, updateUserDto: UpdateUserDto) {
+  async updateUser(id: number, updateUserDto: UpdateUserDto) {
     const user = await this.usersRepository.findOne({
       where: { id: id },
     });

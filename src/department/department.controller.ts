@@ -1,13 +1,4 @@
-import {
-  Controller,
-  Put,
-  // Delete,
-  Post,
-  Get,
-  Body,
-  Param,
-  Patch,
-} from '@nestjs/common';
+import { Controller, Put, Post, Get, Body, Param, Patch } from '@nestjs/common';
 import {
   ApiTags,
   ApiOperation,
@@ -24,42 +15,7 @@ import { SoftDeleteDepartmentDto } from './dtos/SoftDeleteDepartmentDto';
 @Controller('department')
 export class DepartmentController {
   constructor(private departmentService: DepartmentService) {}
-  //! soft delete department
-  @Patch(':id')
-  @ApiOperation({ summary: 'Soft delete a department' })
-  @ApiParam({
-    name: 'id',
-    type: Number,
-    description: 'Department ID',
-    example: 1,
-  })
-  @ApiResponse({
-    status: 200,
-    description: 'Department soft deleted successfully',
-  })
-  @ApiResponse({
-    status: 404,
-    description: 'Department not found',
-  })
-  async softDeleteDepartment(
-    @Param('id') id: number,
-    @Body() softdeleteDepartmentDto: SoftDeleteDepartmentDto,
-  ) {
-    return this.departmentService.softDeleteDepartment(
-      id,
-      softdeleteDepartmentDto,
-    );
-  }
 
-  @Get('deleted-data')
-  @ApiOperation({ summary: 'Get all soft-deleted departments' })
-  @ApiResponse({
-    status: 200,
-    description: 'List of soft-deleted departments',
-  })
-  async getDeleted() {
-    return this.departmentService.getSoftDeleatedDepartments();
-  }
   @Post()
   @ApiOperation({ summary: 'Create a new department' })
   @ApiBody({ type: DepartmentDto })
@@ -85,19 +41,23 @@ export class DepartmentController {
     description: 'List of departments',
     schema: {
       example: [
-        {
-          id: 1,
-          name: 'HR',
-        },
-        {
-          id: 2,
-          name: 'IT',
-        },
+        { id: 1, name: 'HR' },
+        { id: 2, name: 'IT' },
       ],
     },
   })
   async getAllDepartments() {
     return this.departmentService.getAllDepartments();
+  }
+
+  @Get('deleted-data')
+  @ApiOperation({ summary: 'Get all soft-deleted departments' })
+  @ApiResponse({
+    status: 200,
+    description: 'List of soft-deleted departments',
+  })
+  async getDeleted() {
+    return this.departmentService.getSoftDeleatedDepartments();
   }
 
   @Get(':id')
@@ -126,6 +86,32 @@ export class DepartmentController {
     return this.departmentService.getDepartmentById(id);
   }
 
+  @Patch(':id')
+  @ApiOperation({ summary: 'Soft delete a department' })
+  @ApiParam({
+    name: 'id',
+    type: Number,
+    description: 'Department ID',
+    example: 1,
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Department soft deleted successfully',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Department not found',
+  })
+  async softDeleteDepartment(
+    @Param('id') id: number,
+    @Body() softdeleteDepartmentDto: SoftDeleteDepartmentDto,
+  ) {
+    return this.departmentService.softDeleteDepartment(
+      id,
+      softdeleteDepartmentDto,
+    );
+  }
+
   @Put(':id')
   @ApiOperation({ summary: 'Update department' })
   @ApiParam({
@@ -150,24 +136,4 @@ export class DepartmentController {
   ) {
     return this.departmentService.updateDepartment(id, departmentDto);
   }
-
-  // @Delete(':id')
-  // @ApiOperation({ summary: 'Delete department' })
-  // @ApiParam({
-  //   name: 'id',
-  //   type: Number,
-  //   example: 1,
-  // })
-  // @ApiResponse({
-  //   status: 200,
-  //   description: 'Department deleted successfully',
-  //   schema: {
-  //     example: {
-  //       message: 'Department deleted',
-  //     },
-  //   },
-  // })
-  // async deleteDepartment(@Param('id') id: number) {
-  //   return this.departmentService.deleteDepartment(id);
-  // }
 }

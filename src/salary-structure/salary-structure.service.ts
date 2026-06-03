@@ -17,7 +17,7 @@ export class SalaryStructureService {
     private salaryStructureRepository: Repository<SalaryStructure>,
   ) {}
 
-  async createSlaryStructure(
+  async createSalaryStructure(
     createSalaryStructureDto: CreateSalaryStructureDto,
   ) {
     const existsSalaryForEmployee =

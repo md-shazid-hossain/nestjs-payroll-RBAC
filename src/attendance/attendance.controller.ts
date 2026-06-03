@@ -24,15 +24,6 @@ export class AttendanceController {
     return this.attendanceService.getAllAttendances();
   }
 
-  @Get(':id')
-  @ApiOperation({ summary: 'Get attendance by ID' })
-  @ApiParam({ name: 'id', type: Number, description: 'Attendance ID' })
-  @ApiResponse({ status: 200, description: 'Attendance found' })
-  @ApiResponse({ status: 404, description: 'Attendance not found' })
-  getAttendanceById(@Param('id') id: number) {
-    return this.attendanceService.getAttendanceById(id);
-  }
-
   @Get('monthly-working-hours/:id/:month/:year')
   @ApiOperation({ summary: 'Get monthly working hours for an employee' })
   @ApiParam({ name: 'id', type: Number, description: 'Employee ID' })
@@ -45,6 +36,15 @@ export class AttendanceController {
     @Param('year') year: number,
   ) {
     return this.attendanceService.monthlyWorkingHour(id, month, year);
+  }
+
+  @Get(':id')
+  @ApiOperation({ summary: 'Get attendance by ID' })
+  @ApiParam({ name: 'id', type: Number, description: 'Attendance ID' })
+  @ApiResponse({ status: 200, description: 'Attendance found' })
+  @ApiResponse({ status: 404, description: 'Attendance not found' })
+  getAttendanceById(@Param('id') id: number) {
+    return this.attendanceService.getAttendanceById(id);
   }
 
   @Patch('check-out/:id')

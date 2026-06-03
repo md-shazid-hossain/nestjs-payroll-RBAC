@@ -38,38 +38,11 @@ export class EmployeesController {
 
   @Post()
   @RequirePermissions('create:employee')
-  @ApiOperation({
-    summary: 'Create a new employee',
-  })
-  @ApiBody({
-    type: EmployeeCreateDto,
-  })
+  @ApiOperation({ summary: 'Create a new employee' })
+  @ApiBody({ type: EmployeeCreateDto })
   @ApiResponse({
     status: 201,
     description: 'Employee created successfully',
-    schema: {
-      example: {
-        id: 1,
-        name: 'John Doe',
-        email: 'john.doe@example.com',
-        phone: '+8801712345678',
-        department_id: 1,
-        base_salary: 50000,
-        status: true,
-        joiningDate: '2026-05-10',
-        gender: 'Male',
-        fathersName: 'Robert Doe',
-        mothersName: 'Jane Doe',
-        dateOfBirth: '2000-01-01',
-        nid: '1234567890',
-        education: 'BSc in Computer Science',
-        presentAddress: 'Dhaka, Bangladesh',
-        permanentAddress: 'Khulna, Bangladesh',
-        experience: '3 years',
-        createdAt: '2026-05-20T10:00:00.000Z',
-        updatedAt: '2026-05-20T10:00:00.000Z',
-      },
-    },
   })
   async createEmployee(@Body() employeeCreateDto: EmployeeCreateDto) {
     return this.employeesService.createEmployee(employeeCreateDto);
@@ -77,72 +50,54 @@ export class EmployeesController {
 
   @Get()
   @RequirePermissions('read:employee')
-  @ApiOperation({
-    summary: 'Get all employees',
-  })
-  @ApiResponse({
-    status: 200,
-    description: 'Employees fetched successfully',
-  })
+  @ApiOperation({ summary: 'Get all employees' })
+  @ApiResponse({ status: 200, description: 'Employees fetched successfully' })
   async getAllEmployees() {
     return this.employeesService.getAllEmployees();
   }
 
   @Get('deleted-data')
+  @RequirePermissions('read:employee')
+  @ApiOperation({ summary: 'Get all soft-deleted employees' })
+  @ApiResponse({
+    status: 200,
+    description: 'Soft-deleted employees fetched successfully',
+  })
   async getSoftDeletedData() {
     return await this.employeesService.getDeletedData();
   }
 
   @Get(':id')
   @RequirePermissions('read:singleEmployee')
-  @ApiOperation({
-    summary: 'Get employee by ID',
-  })
+  @ApiOperation({ summary: 'Get employee by ID' })
   @ApiParam({
     name: 'id',
     type: Number,
     example: 1,
     description: 'Employee ID',
   })
-  @ApiResponse({
-    status: 200,
-    description: 'Employee fetched successfully',
-  })
-  @ApiResponse({
-    status: 404,
-    description: 'Employee not found',
-  })
+  @ApiResponse({ status: 200, description: 'Employee fetched successfully' })
+  @ApiResponse({ status: 404, description: 'Employee not found' })
   async getEmployeeById(@Param('id', ParseIntPipe) id: number) {
     return this.employeesService.getEmployeeById(id);
   }
 
   @Put(':id')
   @RequirePermissions('update:employee')
-  @ApiOperation({
-    summary: 'Update employee',
-  })
+  @ApiOperation({ summary: 'Update employee' })
   @ApiParam({
     name: 'id',
     type: Number,
     example: 1,
     description: 'Employee ID',
   })
-  @ApiBody({
-    type: EmployeeUpdateDto,
-  })
+  @ApiBody({ type: EmployeeUpdateDto })
   @ApiResponse({
     status: 200,
     description: 'Employee updated successfully',
-    schema: {
-      example: {
-        message: 'Employee updated successfully',
-      },
-    },
+    schema: { example: { message: 'Employee updated successfully' } },
   })
-  @ApiResponse({
-    status: 404,
-    description: 'Employee not found',
-  })
+  @ApiResponse({ status: 404, description: 'Employee not found' })
   async updateEmployee(
     @Param('id', ParseIntPipe) id: number,
     @Body() employeeUpdateDto: EmployeeUpdateDto,
@@ -150,37 +105,23 @@ export class EmployeesController {
     return this.employeesService.updateEmployee(id, employeeUpdateDto);
   }
 
-  // @Delete(':id')
-  // @RequirePermissions('delete:employee')
-  // @ApiOperation({
-  //   summary: 'Delete employee',
-  // })
-  // @ApiParam({
-  //   name: 'id',
-  //   type: Number,
-  //   example: 1,
-  //   description: 'Employee ID',
-  // })
-  // @ApiResponse({
-  //   status: 200,
-  //   description: 'Employee deleted successfully',
-  //   schema: {
-  //     example: {
-  //       message: 'Employee deleted successfully',
-  //     },
-  //   },
-  // })
-  // @ApiResponse({
-  //   status: 404,
-  //   description: 'Employee not found',
-  // })
-  // async deleteEmployee(@Param('id', ParseIntPipe) id: number) {
-  //   return this.employeesService.deleteEmployee(id);
-  // }
-
   @Patch(':id')
+  @RequirePermissions('delete:employee') // soft delete requires delete permission
+  @ApiOperation({ summary: 'Soft delete an employee' })
+  @ApiParam({
+    name: 'id',
+    type: Number,
+    example: 1,
+    description: 'Employee ID',
+  })
+  @ApiBody({ type: SoftDeleteEmployeeDto })
+  @ApiResponse({
+    status: 200,
+    description: 'Employee soft deleted successfully',
+  })
+  @ApiResponse({ status: 404, description: 'Employee not found' })
   async softDelete(
-    @Param('id') id: number,
+    @Param('id', ParseIntPipe) id: number,
     @Body() softDeleteEmployeeDto: SoftDeleteEmployeeDto,
   ) {
     return this.employeesService.softDelete(id, softDeleteEmployeeDto);

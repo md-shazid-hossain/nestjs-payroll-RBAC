@@ -1,4 +1,12 @@
-import { Body, Controller, Get, Param, Patch, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Patch,
+  Post,
+  ParseIntPipe,
+} from '@nestjs/common';
 import {
   ApiTags,
   ApiOperation,
@@ -31,8 +39,22 @@ export class PermissionController {
     return await this.permissionService.getPermissions();
   }
 
+  @Get('soft-deleted-permissions')
+  @ApiOperation({ summary: 'Get all soft-deleted permissions' })
+  @ApiResponse({
+    status: 200,
+    description: 'List of soft-deleted permissions retrieved.',
+  })
+  async getSoftDeletedPermissionsDto() {
+    return this.permissionService.getAllSoftDeletedPermission();
+  }
+
   @Get(':id')
-  async getPermissionById(@Param('id') id: number) {
+  @ApiOperation({ summary: 'Get a single permission by ID' })
+  @ApiParam({ name: 'id', type: Number, description: 'Permission ID' })
+  @ApiResponse({ status: 200, description: 'Permission found' })
+  @ApiResponse({ status: 404, description: 'Permission not found' })
+  async getPermissionById(@Param('id', ParseIntPipe) id: number) {
     return await this.permissionService.singlePermission(id);
   }
 
@@ -43,22 +65,12 @@ export class PermissionController {
   @ApiResponse({ status: 200, description: 'Permission soft-deleted.' })
   @ApiResponse({ status: 404, description: 'Permission not found.' })
   async softDeletePermission(
-    @Param('id') id: number,
+    @Param('id', ParseIntPipe) id: number,
     @Body() softDeletePermissionDto: SoftDeleteDepartmentDto,
   ) {
     return await this.permissionService.softDeletePermission(
       id,
       softDeletePermissionDto,
     );
-  }
-
-  @Get('soft-deleted-permissions')
-  @ApiOperation({ summary: 'Get all soft-deleted permissions' })
-  @ApiResponse({
-    status: 200,
-    description: 'List of soft-deleted permissions retrieved.',
-  })
-  async getSoftDeletedPermissionsDto() {
-    return this.permissionService.getAllSoftDeletedPermission();
   }
 }

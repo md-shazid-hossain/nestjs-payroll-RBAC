@@ -2,10 +2,10 @@ import { Controller, Post, Body } from '@nestjs/common';
 import {
   ApiTags,
   ApiOperation,
-  ApiResponse,
-  ApiBody,
+  ApiOkResponse,
   ApiCreatedResponse,
   ApiBadRequestResponse,
+  ApiUnauthorizedResponse,
   ApiConflictResponse,
 } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
@@ -17,15 +17,12 @@ import { RegisterUserDto } from './dtos/userRegister.dto';
 export class AuthController {
   constructor(private authService: AuthService) {}
 
-  //! User login endpoint
   @Post('login')
   @ApiOperation({
     summary: 'User login',
     description: 'Authenticates user and returns JWT token',
   })
-  @ApiBody({ type: LoginDto })
-  @ApiResponse({
-    status: 200,
+  @ApiOkResponse({
     description: 'Login successful',
     schema: {
       example: {
@@ -38,17 +35,26 @@ export class AuthController {
       },
     },
   })
-  @ApiResponse({ status: 401, description: 'Invalid credentials' })
+  @ApiUnauthorizedResponse({ description: 'Invalid credentials' })
   async login(@Body() loginDto: LoginDto) {
     return this.authService.login(loginDto);
   }
 
-  //! Register new user endpoint
   @Post('register')
   @ApiOperation({
     summary: 'Register a new user',
     description:
       'Creates a new user account with optional role assignments. Email must be unique and password will be hashed.',
+  })
+  @ApiCreatedResponse({
+    description: 'User registered successfully',
+    schema: {
+      example: {
+        id: 1,
+        email: 'user@example.com',
+        roles: ['employee'],
+      },
+    },
   })
   @ApiBadRequestResponse({
     description:

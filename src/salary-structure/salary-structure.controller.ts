@@ -1,4 +1,13 @@
-import { Body, Controller, Get, Param, Patch, Post, Put } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Put,
+  ParseIntPipe,
+} from '@nestjs/common';
 import {
   ApiTags,
   ApiOperation,
@@ -29,7 +38,8 @@ export class SalaryStructureController {
   async createSalaryStructure(
     @Body() salaryStructureDto: CreateSalaryStructureDto,
   ) {
-    await this.salaryStructureService.createSlaryStructure(salaryStructureDto);
+    // Fixed typo: createSlaryStructure -> createSalaryStructure
+    await this.salaryStructureService.createSalaryStructure(salaryStructureDto);
 
     return {
       success: true,
@@ -39,12 +49,21 @@ export class SalaryStructureController {
 
   @Get()
   @ApiOperation({ summary: 'Get all salary structures' })
-  @ApiResponse({
-    status: 200,
-    description: 'List of salary structures',
-  })
+  @ApiResponse({ status: 200, description: 'List of salary structures' })
   async getSalaryStructures() {
     return await this.salaryStructureService.getSalaryStructure();
+  }
+
+  @Get(':id')
+  @ApiOperation({ summary: 'Get a single salary structure by ID' })
+  @ApiParam({ name: 'id', type: Number, description: 'Salary structure ID' })
+  @ApiResponse({
+    status: 200,
+    description: 'Salary structure retrieved successfully',
+  })
+  @ApiResponse({ status: 404, description: 'Salary structure not found' })
+  async getSingleSalaryStructure(@Param('id', ParseIntPipe) id: number) {
+    return await this.salaryStructureService.getSingleSalaryStructure(id);
   }
 
   @Put(':id')
@@ -57,18 +76,13 @@ export class SalaryStructureController {
   })
   @ApiResponse({ status: 404, description: 'Salary structure not found' })
   async updateSalaryStructure(
-    @Param('id') id: number,
+    @Param('id', ParseIntPipe) id: number,
     @Body() updateSalaryStructureDto: UpdateSalaryStructureDto,
   ) {
     return await this.salaryStructureService.updateSalaryStructure(
       id,
       updateSalaryStructureDto,
     );
-  }
-
-  @Get(':id')
-  async getSingleSalaryStructure(@Param('id') id: number) {
-    return await this.salaryStructureService.getSingleSalaryStructure(id);
   }
 
   @Patch(':id')
@@ -81,7 +95,7 @@ export class SalaryStructureController {
   })
   @ApiResponse({ status: 404, description: 'Salary structure not found' })
   async softDeleteSalaryStructure(
-    @Param('id') id: number,
+    @Param('id', ParseIntPipe) id: number,
     @Body() softDeleteSalaryStructureDto: SoftDeleteSalaryStructure,
   ) {
     return this.salaryStructureService.softDeleteSalaryStructure(

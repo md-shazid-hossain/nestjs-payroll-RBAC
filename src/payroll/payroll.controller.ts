@@ -1,4 +1,11 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  ParseIntPipe,
+} from '@nestjs/common';
 import {
   ApiTags,
   ApiOperation,
@@ -14,7 +21,6 @@ import { MakePayrollDto } from './dtos/makePayroll.dto';
 export class PayrollController {
   constructor(private readonly payrollService: PayrollService) {}
 
-  //! this id is for employee
   @Post()
   @ApiOperation({
     summary: 'Create payroll for an employee',
@@ -24,23 +30,21 @@ export class PayrollController {
     type: MakePayrollDto,
     description: 'Payload containing employee id and month',
   })
-  @ApiResponse({
-    status: 201,
-    description: 'Payroll created successfully',
-  })
-  @ApiResponse({
-    status: 400,
-    description: 'Invalid input data',
-  })
-  @ApiResponse({
-    status: 500,
-    description: 'Internal server error',
-  })
+  @ApiResponse({ status: 201, description: 'Payroll created successfully' })
+  @ApiResponse({ status: 400, description: 'Invalid input data' })
+  @ApiResponse({ status: 500, description: 'Internal server error' })
   async createPayroll(@Body() makePayrollDto: MakePayrollDto) {
     return await this.payrollService.createPayroll(
       makePayrollDto.id,
       makePayrollDto.month,
     );
+  }
+
+  @Get()
+  @ApiOperation({ summary: 'Get all payrolls' })
+  @ApiResponse({ status: 200, description: 'List of all payroll records' })
+  async getAllPayrolls() {
+    return this.payrollService.getAllPayrolls();
   }
 
   @Get(':id')
@@ -58,16 +62,8 @@ export class PayrollController {
     status: 200,
     description: 'Payroll slip retrieved successfully',
   })
-  @ApiResponse({
-    status: 404,
-    description: 'Employee not found',
-  })
-  async getPayrollSlip(@Param('id') id: number) {
+  @ApiResponse({ status: 404, description: 'Employee not found' })
+  async getPayrollSlip(@Param('id', ParseIntPipe) id: number) {
     return this.payrollService.generatePaySlip(id);
-  }
-
-  @Get()
-  async getAllPayrolls() {
-    return this.payrollService.getAllPayrolls();
   }
 }

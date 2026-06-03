@@ -1,4 +1,13 @@
-import { Body, Controller, Get, Param, Post, Put } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Put,
+  ParseIntPipe,
+} from '@nestjs/common';
 import {
   ApiTags,
   ApiOperation,
@@ -7,16 +16,29 @@ import {
   ApiOkResponse,
   ApiBadRequestResponse,
   ApiNotFoundResponse,
+  ApiParam,
+  ApiBody,
 } from '@nestjs/swagger';
 import { RoleService } from './role.service';
 import { CreateRoleDto } from './dtos/createRole.dto';
 import { Role } from './role.entity';
 import { UpdateRoleDto } from './dtos/updateRoleDto';
+import { SoftDeleteRoleDto } from './dtos/softDeleteRole.dto';
 
 @ApiTags('Roles')
 @Controller('role')
 export class RoleController {
   constructor(private readonly roleService: RoleService) {}
+
+  // ✅ Specific static route BEFORE dynamic :id route
+  @Get('soft-deleted-roles')
+  @ApiOperation({ summary: 'Get all soft-deleted roles' })
+  @ApiOkResponse({
+    description: 'List of soft-deleted roles retrieved successfully.',
+  })
+  async getSoftDeletedRoles() {
+    return this.roleService.getSoftDeletedRoles();
+  }
 
   @Post()
   @ApiOperation({
@@ -43,10 +65,10 @@ export class RoleController {
   })
   @ApiOkResponse({
     description: 'List of roles retrieved successfully.',
-    type: [Role], // indicates an array of Role entities
+    type: [Role],
   })
   async getRoles() {
-    return this.roleService.getRole(); // assuming getRole() returns all roles
+    return this.roleService.getRole();
   }
 
   @Get(':id')
@@ -54,6 +76,7 @@ export class RoleController {
     summary: 'Get a role by ID',
     description: 'Returns detailed information about a specific role.',
   })
+  @ApiParam({ name: 'id', type: Number, description: 'Role ID' })
   @ApiOkResponse({
     description: 'Role found and returned successfully.',
     type: Role,
@@ -64,7 +87,7 @@ export class RoleController {
   @ApiBadRequestResponse({
     description: 'Invalid ID format (must be a number).',
   })
-  async getRoleById(@Param('id') id: number) {
+  async getRoleById(@Param('id', ParseIntPipe) id: number) {
     return this.roleService.getRoleById(id);
   }
 
@@ -74,6 +97,8 @@ export class RoleController {
     description:
       'Updates the role name and/or permission list. All fields are optional, but at least one must be provided.',
   })
+  @ApiParam({ name: 'id', type: Number, description: 'Role ID' })
+  @ApiBody({ type: UpdateRoleDto })
   @ApiOkResponse({
     description: 'Role updated successfully.',
     type: Role,
@@ -86,9 +111,24 @@ export class RoleController {
       'Invalid input data (e.g., duplicate permission IDs, non-existent permission IDs, or an empty update DTO).',
   })
   async updateRoles(
-    @Param('id') id: number,
+    @Param('id', ParseIntPipe) id: number,
     @Body() updateRoleDto: UpdateRoleDto,
   ) {
     return this.roleService.updateRole(id, updateRoleDto);
+  }
+
+  @Patch(':id')
+  @ApiOperation({ summary: 'Soft delete a role by ID' })
+  @ApiParam({ name: 'id', type: Number, description: 'Role ID' })
+  @ApiBody({ type: SoftDeleteRoleDto })
+  @ApiOkResponse({ description: 'Role soft deleted successfully.' })
+  @ApiNotFoundResponse({
+    description: 'Role with the given ID does not exist.',
+  })
+  async softDeleteRole(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() softDeleteRoleDto: SoftDeleteRoleDto,
+  ) {
+    return this.roleService.softDeleteRole(id, softDeleteRoleDto);
   }
 }

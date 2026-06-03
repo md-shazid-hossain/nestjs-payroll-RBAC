@@ -9,6 +9,7 @@ import { Role } from './role.entity';
 import { CreateRoleDto } from './dtos/createRole.dto';
 import { Permission } from 'src/permission/permission.entity';
 import { UpdateRoleDto } from './dtos/updateRoleDto';
+import { SoftDeleteRoleDto } from './dtos/softDeleteRole.dto';
 
 @Injectable()
 export class RoleService {
@@ -82,7 +83,7 @@ export class RoleService {
     return await this.roleRepository.save(updateRole);
   }
 
-  async softDeleteRole(id: number) {
+  async softDeleteRole(id: number, softDeleteRoleDto: SoftDeleteRoleDto) {
     const targetToDelete = await this.roleRepository.find({
       where: { id: id },
     });
@@ -93,6 +94,8 @@ export class RoleService {
 
     return await this.roleRepository.update(id, {
       deleteDate: new Date(),
+      delete_reason: softDeleteRoleDto.delete_reason,
+      deletedBy: { id: softDeleteRoleDto.deletedBy },
     });
   }
 
