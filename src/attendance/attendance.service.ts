@@ -4,6 +4,7 @@ import { Attendance, AttendanceStatus } from './attendance.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AttendanceCreateDto } from './dtos/createAttendance.dto';
 import { ConflictException } from '@nestjs/common';
+import { Employees } from 'src/employees/employees.entity';
 
 const officeStartTime = new Date();
 officeStartTime.setHours(9, 0, 0, 0);
@@ -13,10 +14,22 @@ export class AttendanceService {
   constructor(
     @InjectRepository(Attendance)
     private attendanceRepository: Repository<Attendance>,
+
+    @InjectRepository(Employees)
+    private employeeRepository: Repository<Employees>,
   ) {}
 
   //! Create attendance record for an employee (checkin)
   async createAttendance(attendanceCreateDto: AttendanceCreateDto) {
+    //! check if the employee exists on database
+    const isEmployeeExists = await this.employeeRepository.findOne({
+      where: { id: attendanceCreateDto.employee_id },
+    });
+
+    if (!isEmployeeExists) {
+      throw new NotFoundException('Employee Does Not Exists!');
+    }
+
     //! Check if attendance for the employee on the given date already exists
     const existesAttendance = await this.attendanceRepository.findOne({
       where: {
