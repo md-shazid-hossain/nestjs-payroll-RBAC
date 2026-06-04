@@ -55,4 +55,15 @@ export class AttendanceController {
   checkOut(@Param('id') id: number) {
     return this.attendanceService.checkOut(id);
   }
+
+  @Get('attendance-report-on-a-month/:month/:employee_id')
+  async attendenceReportOnAMonth(
+    @Param('month') month: number,
+    @Param('employee_id') employee_id: number,
+  ) {
+    return await this.attendanceService.attendanceReportOnAMonth(
+      month,
+      employee_id,
+    );
+  }
 }

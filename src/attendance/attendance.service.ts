@@ -5,6 +5,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { AttendanceCreateDto } from './dtos/createAttendance.dto';
 import { ConflictException } from '@nestjs/common';
 import { Employees } from 'src/employees/employees.entity';
+import { Holiday } from 'src/holiday/holiday.entity';
 
 const officeStartTime = new Date();
 officeStartTime.setHours(9, 0, 0, 0);
@@ -17,6 +18,9 @@ export class AttendanceService {
 
     @InjectRepository(Employees)
     private employeeRepository: Repository<Employees>,
+
+    @InjectRepository(Holiday)
+    private holidayRepository: Repository<Holiday>,
   ) {}
 
   //! Create attendance record for an employee (checkin)
@@ -44,14 +48,11 @@ export class AttendanceService {
     }
 
     //! Check if the date is a holiday
-    const isHoliday = await this.attendanceRepository.manager.findOne(
-      'Holiday',
-      {
-        where: {
-          date: attendanceCreateDto.date,
-        },
+    const isHoliday = await this.holidayRepository.findOne({
+      where: {
+        date: attendanceCreateDto.date,
       },
-    );
+    });
 
     if (isHoliday) {
       throw new ConflictException('Attendance cannot be created on a holiday');
@@ -143,5 +144,119 @@ export class AttendanceService {
 
     attendance.checkOutTime = new Date();
     return await this.attendanceRepository.save(attendance);
+  }
+
+  //! attendence reports
+  async getAllWorkingDayByEmployeeId(employeeId: number) {
+    const data = await this.attendanceRepository.find({
+      where: {
+        employee_id: {
+          id: employeeId,
+        },
+      },
+      select: {
+        id: true,
+        checkInTime: true,
+        checkOutTime: true,
+        employee_id: {
+          id: true,
+          name: true,
+        },
+        status: true,
+      },
+    });
+
+    return data;
+  }
+
+  async getAllLateDay(employeeId: number) {
+    const data = await this.attendanceRepository.find({
+      where: {
+        employee_id: {
+          id: employeeId,
+        },
+        status: AttendanceStatus.LATE,
+      },
+      select: {
+        id: true,
+        checkInTime: true,
+        checkOutTime: true,
+        employee_id: {
+          id: true,
+          name: true,
+        },
+        status: true,
+      },
+    });
+
+    return data;
+  }
+
+  //! attendence report on a month -------->
+  async attendanceReportOnAMonth(month: number, employeeId: number) {
+    //! calculating without weekend
+    function getWeekdaysInMonth(year: number, month: number): Date[] {
+      const weekdays: Date[] = [];
+      const date = new Date(year, month, 1);
+
+      while (date.getMonth() === month) {
+        const dayOfWeek = date.getDay();
+
+        //? friday and saturday is holiday
+        if (dayOfWeek !== 5 && dayOfWeek !== 6) {
+          weekdays.push(new Date(date));
+        }
+
+        date.setDate(date.getDate() + 1);
+      }
+
+      return weekdays;
+    }
+
+    const weekdays = getWeekdaysInMonth(2026, month);
+
+    // console.log(juneWeekdays.map((d) => d.toLocaleDateString()));
+
+    const totalWeekDay = weekdays.length;
+
+    //! finding holidays
+    const startDate = new Date(2026, month, 1);
+    const endDate = new Date(2026, month + 1, 0, 23, 59, 59);
+    // const endDate = new Date(2026, month + 1, 1);
+
+    // const start = new Date(2026, 0, 1); // Jan 1
+    // const end = new Date(2026, 4, 6); // day after May 5
+
+    const holidays = await this.holidayRepository.count({
+      where: {
+        date: Between(startDate, endDate),
+      },
+    });
+
+    //! total working day
+    const totalWorkingDays = totalWeekDay - holidays;
+
+    //! present day
+    const presentDay = await this.attendanceRepository.count({
+      where: {
+        employee_id: {
+          id: employeeId,
+        },
+        date: Between(startDate, endDate),
+      },
+    });
+
+    const absentDay = totalWorkingDays - presentDay;
+
+    const lateDay = await this.attendanceRepository.count({
+      where: { employee_id: { id: employeeId }, status: AttendanceStatus.LATE },
+    });
+
+    return {
+      total_working_day: totalWorkingDays,
+      total_present_day: presentDay,
+      total_absent_day: absentDay,
+      total_late_day: lateDay,
+    };
   }
 }
