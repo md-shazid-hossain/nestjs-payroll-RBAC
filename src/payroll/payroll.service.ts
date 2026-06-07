@@ -80,7 +80,7 @@ export class PayrollService {
 
     const totalSalary = totalPresentDay * presentDaysSalary;
 
-    console.log(totalPresentDay, presentDaysSalary);
+    // console.log(totalPresentDay, presentDaysSalary);
 
     const deduction = totalLateDay * salaryStructureEmployee.latePenalty;
 
@@ -92,15 +92,6 @@ export class PayrollService {
 
     const afterapplyingTaxAndDeductionSalary =
       afterDeductionSalary - appliedTax;
-
-    console.log({
-      employee: { id: id },
-      month: month,
-      gross: totalSalary,
-      deduction: deduction,
-      net: afterapplyingTaxAndDeductionSalary,
-      taxDeduction: appliedTax,
-    });
 
     const newPayroll = this.payrollRepository.create({
       employee: { id: id },

@@ -1,5 +1,4 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
@@ -20,8 +19,6 @@ import { TaxModule } from './tax/tax.module';
 import { Tax } from './tax/tax.entity';
 import { SalaryStructure } from './salary-structure/salary-structure.entity';
 import { Payroll } from './payroll/payroll.entity';
-import { PermissionController } from './permission/permission.controller';
-import { PermissionService } from './permission/permission.service';
 import { PermissionModule } from './permission/permission.module';
 import { RoleModule } from './role/role.module';
 import { Role } from './role/role.entity';
