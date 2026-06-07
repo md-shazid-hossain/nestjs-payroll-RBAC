@@ -47,6 +47,14 @@ export class PayrollController {
     return this.payrollService.getAllPayrolls();
   }
 
+  @Get('get-salary-by-month/:empid/:month')
+  async getSalaryByMonth(
+    @Param('empid') empid: number,
+    @Param('month') month: number,
+  ) {
+    return this.payrollService.getSalaryForEmployeeByMonth(empid, month);
+  }
+
   @Get(':id')
   @ApiOperation({
     summary: 'Get employee payroll slip',

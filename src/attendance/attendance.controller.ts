@@ -24,6 +24,7 @@ export class AttendanceController {
     return this.attendanceService.getAllAttendances();
   }
 
+  // Specific GET routes first
   @Get('monthly-working-hours/:id/:month/:year')
   @ApiOperation({ summary: 'Get monthly working hours for an employee' })
   @ApiParam({ name: 'id', type: Number, description: 'Employee ID' })
@@ -38,6 +39,47 @@ export class AttendanceController {
     return this.attendanceService.monthlyWorkingHour(id, month, year);
   }
 
+  @Get('get-all-present-day/:emp_id/:month')
+  @ApiOperation({ summary: 'Get all present days for an employee' })
+  @ApiParam({ name: 'emp_id', type: Number, description: 'Employee ID' })
+  @ApiResponse({ status: 200, description: 'List of present days' })
+  @ApiResponse({ status: 404, description: 'Employee not found' })
+  async getAllPresentDay(
+    @Param('emp_id') emp_id: number,
+    @Param('month') month: number,
+  ) {
+    return this.attendanceService.getAllPresentDays(emp_id, month);
+  }
+
+  @Get('get-all-late-day/:emp_id')
+  @ApiOperation({ summary: 'Get all late days for an employee' })
+  @ApiParam({ name: 'emp_id', type: Number, description: 'Employee ID' })
+  @ApiResponse({ status: 200, description: 'List of late days' })
+  @ApiResponse({ status: 404, description: 'Employee not found' })
+  async getAllLateDay(
+    @Param('emp_id') emp_id: number,
+    @Param('month') month: number,
+  ) {
+    return this.attendanceService.getAllLateDay(emp_id, month);
+  }
+
+  @Get('attendance-report-on-a-month/:month/:employee_id')
+  @ApiOperation({ summary: 'Get attendance report for an employee in a month' })
+  @ApiParam({ name: 'month', type: Number, description: 'Month (1-12)' })
+  @ApiParam({ name: 'employee_id', type: Number, description: 'Employee ID' })
+  @ApiResponse({ status: 200, description: 'Attendance report generated' })
+  @ApiResponse({ status: 404, description: 'Employee not found' })
+  async attendenceReportOnAMonth(
+    @Param('month') month: number,
+    @Param('employee_id') employee_id: number,
+  ) {
+    return await this.attendanceService.attendanceReportOnAMonth(
+      month,
+      employee_id,
+    );
+  }
+
+  // Generic `:id` route placed LAST to avoid overshadowing other GET routes
   @Get(':id')
   @ApiOperation({ summary: 'Get attendance by ID' })
   @ApiParam({ name: 'id', type: Number, description: 'Attendance ID' })
@@ -54,16 +96,5 @@ export class AttendanceController {
   @ApiResponse({ status: 404, description: 'Attendance not found' })
   checkOut(@Param('id') id: number) {
     return this.attendanceService.checkOut(id);
-  }
-
-  @Get('attendance-report-on-a-month/:month/:employee_id')
-  async attendenceReportOnAMonth(
-    @Param('month') month: number,
-    @Param('employee_id') employee_id: number,
-  ) {
-    return await this.attendanceService.attendanceReportOnAMonth(
-      month,
-      employee_id,
-    );
   }
 }

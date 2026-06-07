@@ -57,8 +57,13 @@ export class DepartmentService {
     if (!department) {
       throw new NotFoundException('Department no found');
     }
-    department.name = departmentDto.name;
-    return this.departmentRepository.save(department);
+
+    await this.departmentRepository.update(id, { name: departmentDto.name });
+
+    return {
+      success: true,
+      message: 'Department updated successfully',
+    };
   }
 
   async softDeleteDepartment(

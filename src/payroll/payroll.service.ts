@@ -1,10 +1,15 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Payroll } from './payroll.entity';
-import { LessThanOrEqual, MoreThanOrEqual, Repository } from 'typeorm';
+import {
+  Between,
+  In,
+  LessThanOrEqual,
+  MoreThanOrEqual,
+  Repository,
+} from 'typeorm';
 import { SalaryStructure } from 'src/salary-structure/salary-structure.entity';
 import { Attendance, AttendanceStatus } from 'src/attendance/attendance.entity';
-import { Raw } from 'typeorm';
 import { Tax } from 'src/tax/tax.entity';
 
 @Injectable()
@@ -25,28 +30,26 @@ export class PayrollService {
 
   async createPayroll(id: number, month: number) {
     // console.log(month, id);
-
-    // ! total workday
-    const totalPresentDayOntime = await this.attendenceRepository.count({
+    const startDate = new Date(2026, month, 1);
+    const endDate = new Date(2026, month + 1, 0, 23, 59, 59);
+    // ! total Present day count in a month
+    const totalPresentDay = await this.attendenceRepository.count({
       where: {
         employee_id: { id: id },
         //! ArrayContains checks whether a Postgres array column includes the given value(s) in a TypeORM query.
-        status: AttendanceStatus.LATE || AttendanceStatus.PRESENT,
-
-        date: Raw((alias) => `EXTRACT(MONTH FROM ${alias}) = :month`, {
-          month,
-        }),
+        status: In([AttendanceStatus.LATE, AttendanceStatus.PRESENT]),
+        date: Between(startDate, endDate),
       },
     });
 
-    //! late day count
+    console.log('present day', totalPresentDay);
+
+    //! total late day count in a month
     const totalLateDay = await this.attendenceRepository.count({
       where: {
         employee_id: { id: id },
         status: AttendanceStatus.LATE,
-        date: Raw((alias) => `EXTRACT(MONTH FROM ${alias}) = :month`, {
-          month,
-        }),
+        date: Between(startDate, endDate),
       },
     });
 
@@ -71,11 +74,13 @@ export class PayrollService {
       },
     });
 
-    console.log({ message: 'why is null' }, findTax);
+    // console.log({ message: 'why is null' }, findTax);
 
     const presentDaysSalary = salaryStructureEmployee?.basicSalary / 30;
 
-    const totalSalary = totalPresentDayOntime * presentDaysSalary;
+    const totalSalary = totalPresentDay * presentDaysSalary;
+
+    console.log(totalPresentDay, presentDaysSalary);
 
     const deduction = totalLateDay * salaryStructureEmployee.latePenalty;
 
@@ -83,8 +88,19 @@ export class PayrollService {
 
     const appliedTax = afterDeductionSalary / (findTax?.percentage || 0);
 
+    // console.log(appliedTax, findTax);
+
     const afterapplyingTaxAndDeductionSalary =
       afterDeductionSalary - appliedTax;
+
+    console.log({
+      employee: { id: id },
+      month: month,
+      gross: totalSalary,
+      deduction: deduction,
+      net: afterapplyingTaxAndDeductionSalary,
+      taxDeduction: appliedTax,
+    });
 
     const newPayroll = this.payrollRepository.create({
       employee: { id: id },
@@ -143,5 +159,25 @@ export class PayrollService {
         },
       },
     });
+  }
+
+  async getSalaryForEmployeeByMonth(empId: number, month: number) {
+    const salaryByMonth = await this.payrollRepository.find({
+      where: {
+        employee: { id: empId },
+        month: month,
+      },
+      relations: ['employee'],
+      select: {
+        employee: {
+          name: true,
+          email: true,
+          phone: true,
+          status: true,
+        },
+      },
+    });
+
+    return salaryByMonth;
   }
 }

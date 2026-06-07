@@ -147,12 +147,16 @@ export class AttendanceService {
   }
 
   //! attendence reports
-  async getAllWorkingDayByEmployeeId(employeeId: number) {
+  async getAllPresentDays(employeeId: number, month: number) {
+    const startDate = new Date(2026, month, 1);
+    const endDate = new Date(2026, month + 1, 0, 23, 59, 59);
+
     const data = await this.attendanceRepository.find({
       where: {
         employee_id: {
           id: employeeId,
         },
+        date: Between(startDate, endDate),
       },
       select: {
         id: true,
@@ -169,12 +173,16 @@ export class AttendanceService {
     return data;
   }
 
-  async getAllLateDay(employeeId: number) {
+  async getAllLateDay(employeeId: number, month: number) {
+    const startDate = new Date(2026, month, 1);
+    const endDate = new Date(2026, month + 1, 0, 23, 59, 59);
+
     const data = await this.attendanceRepository.find({
       where: {
         employee_id: {
           id: employeeId,
         },
+        date: Between(startDate, endDate),
         status: AttendanceStatus.LATE,
       },
       select: {
@@ -215,17 +223,11 @@ export class AttendanceService {
 
     const weekdays = getWeekdaysInMonth(2026, month);
 
-    // console.log(juneWeekdays.map((d) => d.toLocaleDateString()));
-
     const totalWeekDay = weekdays.length;
 
     //! finding holidays
     const startDate = new Date(2026, month, 1);
     const endDate = new Date(2026, month + 1, 0, 23, 59, 59);
-    // const endDate = new Date(2026, month + 1, 1);
-
-    // const start = new Date(2026, 0, 1); // Jan 1
-    // const end = new Date(2026, 4, 6); // day after May 5
 
     const holidays = await this.holidayRepository.count({
       where: {
@@ -252,11 +254,41 @@ export class AttendanceService {
       where: { employee_id: { id: employeeId }, status: AttendanceStatus.LATE },
     });
 
+    const presentdayData = await this.attendanceRepository.find({
+      where: {
+        employee_id: {
+          id: employeeId,
+        },
+        date: Between(startDate, endDate),
+      },
+      select: {
+        id: true,
+        date: true,
+        status: true,
+        checkInTime: true,
+        checkOutTime: true,
+      },
+    });
+
+    const lateDayData = await this.attendanceRepository.find({
+      where: { employee_id: { id: employeeId }, status: AttendanceStatus.LATE },
+      select: {
+        id: true,
+        date: true,
+        status: true,
+        checkInTime: true,
+        checkOutTime: true,
+      },
+    });
+
     return {
-      total_working_day: totalWorkingDays,
-      total_present_day: presentDay,
-      total_absent_day: absentDay,
-      total_late_day: lateDay,
+      total_working_days: totalWorkingDays,
+      total_holidays: holidays,
+      total_present_days: presentDay,
+      presentdayData,
+      total_absent_days: absentDay,
+      total_late_days: lateDay,
+      lateDayData,
     };
   }
 }
