@@ -9,6 +9,7 @@ import { Employees } from './employees.entity';
 import { EmployeeCreateDto } from './dtos/employeesCreate.dto';
 import { EmployeeUpdateDto } from './dtos/employeeUpdate.dto';
 import { SoftDeleteEmployeeDto } from './dtos/SoftDeleteEmployeeDto';
+import fs from 'fs';
 
 @Injectable()
 export class EmployeesService {
@@ -17,7 +18,10 @@ export class EmployeesService {
     private employeesRepository: Repository<Employees>,
   ) {}
 
-  async createEmployee(employeesCreateDto: EmployeeCreateDto) {
+  async createEmployee(
+    employeesCreateDto: EmployeeCreateDto,
+    filename: string,
+  ) {
     const employee = await this.employeesRepository.findOne({
       where: {
         email: employeesCreateDto.email,
@@ -30,6 +34,7 @@ export class EmployeesService {
 
     const newEmployee = this.employeesRepository.create({
       ...employeesCreateDto,
+      profile_pic: filename,
       department_id: {
         id: employeesCreateDto.department_id,
       },
@@ -39,7 +44,7 @@ export class EmployeesService {
   }
 
   async getAllEmployees() {
-    return this.employeesRepository
+    const employeeData = this.employeesRepository
       .createQueryBuilder('employee')
       .leftJoin('employee.department_id', 'department')
       .leftJoin('employee.salaryStructures', 'salaryStructures')
@@ -60,11 +65,16 @@ export class EmployeesService {
       .addSelect('employee.permanentAddress', 'permanentAddress')
       .addSelect('employee.status', 'status')
 
-      .addSelect('department.name', 'departmentName')
-
+      .addSelect('department.name', 'department_name')
       .addSelect('salaryStructures.basicSalary', 'basicSalary')
+      .addSelect(
+        `'http://localhost:3000/employees/employee_image/' || employee.profile_pic`,
+        'image_url',
+      )
 
       .getRawMany();
+
+    return employeeData;
   }
 
   // async getAllEmployees() {
@@ -124,7 +134,11 @@ export class EmployeesService {
     return employee;
   }
 
-  async updateEmployee(id: number, employeeUpdateDto: EmployeeUpdateDto) {
+  async updateEmployee(
+    id: number,
+    employeeUpdateDto: EmployeeUpdateDto,
+    fileName?: string,
+  ) {
     const employee = await this.employeesRepository.findOne({
       where: { id },
     });
@@ -133,11 +147,18 @@ export class EmployeesService {
       throw new ConflictException('Employee Does not exists');
     }
 
+    if (fileName !== '') {
+      const filePath = `uploads/${employee.profile_pic}`;
+
+      fs.unlinkSync(filePath);
+    }
+
     const updatedEmployee = this.employeesRepository.merge(employee, {
       ...employeeUpdateDto,
       department_id: {
         id: employeeUpdateDto.department_id,
       },
+      profile_pic: fileName,
     });
 
     return await this.employeesRepository.save(updatedEmployee);

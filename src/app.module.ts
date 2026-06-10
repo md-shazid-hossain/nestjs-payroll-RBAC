@@ -23,11 +23,18 @@ import { PermissionModule } from './permission/permission.module';
 import { RoleModule } from './role/role.module';
 import { Role } from './role/role.entity';
 import { Permission } from './permission/permission.entity';
+import { StripeModule } from './stripe/stripe.module';
+import { StripeTable } from './stripe/stripe.entity';
+import { FilesController } from './files/files.controller';
+import { FilesService } from './files/files.service';
+import { FilesModule } from './files/files.module';
 
 @Module({
   imports: [
+    ConfigModule.forRoot({ isGlobal: true }),
     AuthModule,
     UsersModule,
+    StripeModule,
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
@@ -44,6 +51,7 @@ import { Permission } from './permission/permission.entity';
           Payroll,
           Role,
           Permission,
+          StripeTable,
         ], //! add all entities here
         synchronize: true, //! for only development mode it should be true
         host: 'localhost',
@@ -62,7 +70,10 @@ import { Permission } from './permission/permission.entity';
     TaxModule,
     PermissionModule,
     RoleModule,
+    StripeModule,
+    FilesModule,
   ],
-  providers: [AppService],
+  providers: [AppService, FilesService],
+  controllers: [FilesController],
 })
 export class AppModule {}

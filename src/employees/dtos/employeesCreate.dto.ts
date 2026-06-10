@@ -47,7 +47,6 @@ export class EmployeeCreateDto {
     example: 1,
   })
   @IsNotEmpty({ message: 'department_id is required' })
-  @IsNumber({}, { message: 'department_id must be a number' })
   department_id!: number;
 
   // @ApiProperty({
@@ -63,7 +62,6 @@ export class EmployeeCreateDto {
     example: true,
   })
   @IsNotEmpty({ message: 'status is required' })
-  @IsBoolean({ message: 'status must be a boolean' })
   status!: boolean;
 
   @ApiProperty({
@@ -172,12 +170,15 @@ export class EmployeeCreateDto {
   @MaxLength(100, { message: 'experience must be at most 100 characters' })
   experience!: string;
 
-  @ApiProperty({
-    description: 'Existing user ID to link (optional)',
-    example: 42,
-    required: false,
-  })
-  @IsOptional()
-  @IsNumber()
-  user?: number;
+  // @ApiProperty({
+  //   description: 'Existing user ID to link (optional)',
+  //   example: 42,
+  //   required: false,
+  // })
+  // @IsOptional()
+  // @IsNumber()
+  // user?: number;
+
+  @ApiProperty({ type: 'string', format: 'binary' })
+  file: any;
 }

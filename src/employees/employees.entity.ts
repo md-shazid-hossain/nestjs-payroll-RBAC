@@ -168,4 +168,12 @@ export class Employees {
     unique: true,
   })
   delete_reason!: string;
+
+  @Column({
+    nullable: true,
+    type: 'varchar',
+    length: 1000,
+    unique: true,
+  })
+  profile_pic!: string;
 }
