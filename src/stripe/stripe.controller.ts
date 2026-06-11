@@ -12,11 +12,18 @@ import {
   ApiBadRequestResponse,
   ApiNotFoundResponse,
 } from '@nestjs/swagger';
+import { InjectRepository } from '@nestjs/typeorm';
+import { StripeTable } from './stripe.entity';
+import { Repository } from 'typeorm';
 
 @ApiTags('Payments')
 @Controller('payments')
 export class StripeController {
-  constructor(private readonly stripeService: StripeService) {}
+  constructor(
+    @InjectRepository(StripeTable)
+    private readonly stripeRepository: Repository<StripeTable>,
+    private readonly stripeService: StripeService,
+  ) {}
 
   @Post('create-checkout-session/:emp_id')
   @ApiOperation({
@@ -28,7 +35,7 @@ export class StripeController {
     name: 'emp_id',
     description: 'Employee ID',
     type: Number,
-    example: 12345,
+    example: 6,
   })
   @ApiCreatedResponse({
     description: 'Checkout session created successfully',
@@ -77,12 +84,28 @@ export class StripeController {
   })
   @ApiBadRequestResponse({ description: 'Invalid session ID provided' })
   @ApiNotFoundResponse({ description: 'Session not found' })
-  async sessionStatus(@Query('session_id') sessionId: string) {
+  async sessionStatus(
+    @Query('session_id') sessionId: string,
+    @Query('emp_id') emp_id: number,
+  ) {
     const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
       apiVersion: '2026-05-27.dahlia',
     });
     const session = await stripe.checkout.sessions.retrieve(sessionId);
     console.log(session);
+
+    if (session.status === 'complete') {
+      this.stripeRepository.create({
+        employee_id: { id: emp_id },
+        provided_salary: Number(session.amount_total),
+        date: new Date(),
+      });
+
+      return {
+        status: session.status,
+        message: 'Payment Complete!',
+      };
+    }
 
     return {
       status: session.status,
