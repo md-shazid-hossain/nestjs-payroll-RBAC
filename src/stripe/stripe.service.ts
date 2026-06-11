@@ -63,16 +63,6 @@ export class StripeService {
 
     // console.log(session);
 
-    if (session.success_url) {
-      const stripeRecord = this.stripeRepository.create({
-        date: new Date(),
-        employee_id: { id: emp_id },
-        provided_salary: payAmount.gross,
-      });
-
-      await this.stripeRepository.save(stripeRecord);
-    }
-
-    return { url: session.url, session };
+    return { url: session.url, sessionId: session.id };
   }
 }
