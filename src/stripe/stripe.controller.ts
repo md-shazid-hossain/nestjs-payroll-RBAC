@@ -67,7 +67,6 @@ export class StripeController {
     description: 'Stripe checkout session ID',
     required: true,
     type: String,
-    example: 'cs_test_a1b2c3d4e5f6g7h8i9j0',
   })
   @ApiOkResponse({
     description: 'Session status retrieved successfully',
@@ -92,7 +91,7 @@ export class StripeController {
       apiVersion: '2026-05-27.dahlia',
     });
     const session = await stripe.checkout.sessions.retrieve(sessionId);
-    console.log(session);
+    // console.log(session);
 
     if (session.status === 'complete') {
       this.stripeRepository.create({

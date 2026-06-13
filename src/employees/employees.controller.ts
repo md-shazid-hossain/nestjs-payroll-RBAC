@@ -55,7 +55,7 @@ export class EmployeesController {
     @Body() employeeCreateDto: EmployeeCreateDto,
     @UploadedFile() file: Express.Multer.File, // Typing the file object
   ) {
-    console.log(file.filename);
+    // console.log(file.filename);
 
     if (!file) {
       throw new BadRequestException('No Image File Detected');
