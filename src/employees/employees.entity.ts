@@ -128,8 +128,6 @@ export class Employees {
   @OneToOne(() => SalaryStructure, (salary) => salary.employee_id)
   salaryStructure!: SalaryStructure;
 
-
-
   @CreateDateColumn({
     type: 'timestamp',
     default: () => 'CURRENT_TIMESTAMP(6)',
