@@ -1,22 +1,38 @@
-import { Controller, Put, Post, Get, Body, Param, Patch } from '@nestjs/common';
+import {
+  Controller,
+  Put,
+  Post,
+  Get,
+  Body,
+  Param,
+  Patch,
+  UseGuards,
+} from '@nestjs/common';
 import {
   ApiTags,
   ApiOperation,
   ApiResponse,
   ApiParam,
   ApiBody,
+  ApiBearerAuth,
 } from '@nestjs/swagger';
 
 import { DepartmentService } from './department.service';
 import { DepartmentDto } from './dtos/department.dto';
 import { SoftDeleteDepartmentDto } from './dtos/SoftDeleteDepartmentDto';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import { PermissionsGuard } from 'src/auth/guards/permission.guard';
+import { RequirePermissions } from 'src/auth/decorators/permission.decorator';
 
 @ApiTags('Department')
+@ApiBearerAuth()
+@UseGuards(JwtAuthGuard, PermissionsGuard)
 @Controller('department')
 export class DepartmentController {
   constructor(private departmentService: DepartmentService) {}
 
   @Post()
+  @RequirePermissions('create:department')
   @ApiOperation({ summary: 'Create a new department' })
   @ApiBody({ type: DepartmentDto })
   @ApiResponse({
@@ -35,22 +51,18 @@ export class DepartmentController {
   }
 
   @Get()
+  @RequirePermissions('read:department')
   @ApiOperation({ summary: 'Get all departments' })
   @ApiResponse({
     status: 200,
     description: 'List of departments',
-    schema: {
-      example: [
-        { id: 1, name: 'HR' },
-        { id: 2, name: 'IT' },
-      ],
-    },
   })
   async getAllDepartments() {
     return this.departmentService.getAllDepartments();
   }
 
   @Get('deleted-data')
+  @RequirePermissions('read:department')
   @ApiOperation({ summary: 'Get all soft-deleted departments' })
   @ApiResponse({
     status: 200,
@@ -61,6 +73,7 @@ export class DepartmentController {
   }
 
   @Get(':id')
+  @RequirePermissions('read:department')
   @ApiOperation({ summary: 'Get department by ID' })
   @ApiParam({
     name: 'id',
@@ -87,6 +100,7 @@ export class DepartmentController {
   }
 
   @Patch(':id')
+  @RequirePermissions('delete:department')
   @ApiOperation({ summary: 'Soft delete a department' })
   @ApiParam({
     name: 'id',
@@ -113,6 +127,7 @@ export class DepartmentController {
   }
 
   @Put(':id')
+  @RequirePermissions('update:department')
   @ApiOperation({ summary: 'Update department' })
   @ApiParam({
     name: 'id',

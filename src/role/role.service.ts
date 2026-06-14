@@ -32,6 +32,17 @@ export class RoleService {
       );
     }
 
+    // ckeck if the permission is available in db
+    for (const x of createRoleDto.permissionIds ?? []) {
+      const exists = await this.permissionRepository.findOne({
+        where: { id: x },
+      });
+
+      if (!exists) {
+        throw new NotFoundException(`Permission ID ${x} does not exist`);
+      }
+    }
+
     const role = this.roleRepository.create({
       name: createRoleDto.name,
       permissions: createRoleDto.permissionIds?.map((id) => ({ id })) ?? [],
@@ -69,10 +80,23 @@ export class RoleService {
       throw new ConflictException(`User Role: ${updateRoleDto.name} Not found`);
     }
 
+    // ckeck if the permission is available in db
+    for (const x of updateRoleDto.permissionIds ?? []) {
+      const exists = await this.permissionRepository.findOne({
+        where: { id: x },
+      });
+
+      if (!exists) {
+        throw new NotFoundException(
+          `Permission ID ${x} does not exist in Permission Table`,
+        );
+      }
+    }
+
     const updateRole = await this.roleRepository.preload({
       id: role.id,
       ...updateRoleDto,
-      permissions: updateRoleDto.permissionIds?.map((id) => ({ id })) ?? [],
+      permissions: updateRoleDto.permissionIds?.map((id) => ({ id })),
     });
     // console.log(updateRole);
 
