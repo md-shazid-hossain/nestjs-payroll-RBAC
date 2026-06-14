@@ -55,7 +55,7 @@ export class Employees {
     type: 'date',
     nullable: false,
   })
-  joiningDate: Date;
+  joiningDate!: Date;
 
   @Column({
     type: 'varchar',
@@ -125,15 +125,10 @@ export class Employees {
   @OneToMany(() => Payroll, (payroll) => payroll.employee)
   payrolls!: Payroll[];
 
-  @OneToOne(
-    () => SalaryStructure,
-    (SalaryStructure) => SalaryStructure.employee_id,
-  )
-  salaryStructures!: SalaryStructure;
+  @OneToOne(() => SalaryStructure, (salary) => salary.employee_id)
+  salaryStructure!: SalaryStructure;
 
-  constructor() {
-    this.joiningDate = new Date();
-  }
+
 
   @CreateDateColumn({
     type: 'timestamp',
@@ -176,4 +171,11 @@ export class Employees {
     unique: true,
   })
   profile_pic!: string;
+
+  @Column({
+    nullable: true,
+    type: 'varchar',
+    length: 1000,
+  })
+  designation!: string;
 }

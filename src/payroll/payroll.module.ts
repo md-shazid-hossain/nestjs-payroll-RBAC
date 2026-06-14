@@ -7,6 +7,7 @@ import { SalaryStructure } from 'src/salary-structure/salary-structure.entity';
 import { Attendance } from 'src/attendance/attendance.entity';
 import { Employees } from 'src/employees/employees.entity';
 import { Tax } from 'src/tax/tax.entity';
+import { Holiday } from 'src/holiday/holiday.entity';
 
 @Module({
   controllers: [PayrollController],
@@ -18,6 +19,7 @@ import { Tax } from 'src/tax/tax.entity';
       Attendance,
       Employees,
       Tax,
+      Holiday,
     ]),
   ],
 })

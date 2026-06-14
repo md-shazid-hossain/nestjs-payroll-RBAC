@@ -197,6 +197,12 @@ export class AttendanceService {
       },
     });
 
+    // console.log(data);
+
+    if (!data) {
+      throw new NotFoundException('Attendance data not found!');
+    }
+
     return data;
   }
 
@@ -251,10 +257,14 @@ export class AttendanceService {
     const absentDay = totalWorkingDays - presentDay;
 
     const lateDay = await this.attendanceRepository.count({
-      where: { employee_id: { id: employeeId }, status: AttendanceStatus.LATE },
+      where: {
+        employee_id: { id: employeeId },
+        status: AttendanceStatus.LATE,
+        date: Between(startDate, endDate),
+      },
     });
 
-    const presentdayData = await this.attendanceRepository.find({
+    const presentDayData = await this.attendanceRepository.find({
       where: {
         employee_id: {
           id: employeeId,
@@ -271,7 +281,11 @@ export class AttendanceService {
     });
 
     const lateDayData = await this.attendanceRepository.find({
-      where: { employee_id: { id: employeeId }, status: AttendanceStatus.LATE },
+      where: {
+        employee_id: { id: employeeId },
+        status: AttendanceStatus.LATE,
+        date: Between(startDate, endDate),
+      },
       select: {
         id: true,
         date: true,
@@ -285,9 +299,9 @@ export class AttendanceService {
       total_working_days: totalWorkingDays,
       total_holidays: holidays,
       total_present_days: presentDay,
-      presentdayData,
       total_absent_days: absentDay,
       total_late_days: lateDay,
+      presentDayData,
       lateDayData,
     };
   }

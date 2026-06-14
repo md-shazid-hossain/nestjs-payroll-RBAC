@@ -40,6 +40,14 @@ export class PayrollController {
     );
   }
 
+  @Get('payroll-report/:emp_id/:month')
+  async payrollReport(
+    @Param('emp_id') emp_id: number,
+    @Param('month') month: number,
+  ) {
+    return await this.payrollService.payrollRecord(emp_id, month);
+  }
+
   @Get()
   @ApiOperation({ summary: 'Get all payrolls' })
   @ApiResponse({ status: 200, description: 'List of all payroll records' })

@@ -51,7 +51,7 @@ export class AttendanceController {
     return this.attendanceService.getAllPresentDays(emp_id, month);
   }
 
-  @Get('get-all-late-day/:emp_id')
+  @Get('get-all-late-day/:emp_id/:month')
   @ApiOperation({ summary: 'Get all late days for an employee' })
   @ApiParam({ name: 'emp_id', type: Number, description: 'Employee ID' })
   @ApiResponse({ status: 200, description: 'List of late days' })
@@ -79,14 +79,17 @@ export class AttendanceController {
     );
   }
 
-  // Generic `:id` route placed LAST to avoid overshadowing other GET routes
-  @Get(':id')
+  @Get(':attendance_id')
   @ApiOperation({ summary: 'Get attendance by ID' })
-  @ApiParam({ name: 'id', type: Number, description: 'Attendance ID' })
+  @ApiParam({
+    name: 'attendance_id',
+    type: Number,
+    description: 'Attendance ID',
+  })
   @ApiResponse({ status: 200, description: 'Attendance found' })
   @ApiResponse({ status: 404, description: 'Attendance not found' })
-  getAttendanceById(@Param('id') id: number) {
-    return this.attendanceService.getAttendanceById(id);
+  getAttendanceById(@Param('attendance_id') attendance_id: number) {
+    return this.attendanceService.getAttendanceById(attendance_id);
   }
 
   @Patch('check-out/:id')

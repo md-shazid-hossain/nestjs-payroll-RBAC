@@ -91,14 +91,16 @@ export class StripeController {
       apiVersion: '2026-05-27.dahlia',
     });
     const session = await stripe.checkout.sessions.retrieve(sessionId);
-    // console.log(session);
+    console.log(session.status); // showing complete
 
     if (session.status === 'complete') {
-      this.stripeRepository.create({
+      const stripeRecord = this.stripeRepository.create({
         employee_id: { id: emp_id },
         provided_salary: Number(session.amount_total),
         date: new Date(),
       });
+
+      await this.stripeRepository.save(stripeRecord);
 
       return {
         status: session.status,

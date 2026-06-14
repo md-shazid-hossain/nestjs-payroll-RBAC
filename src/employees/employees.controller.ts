@@ -27,16 +27,16 @@ import {
 import { EmployeesService } from './employees.service';
 import { EmployeeCreateDto } from './dtos/employeesCreate.dto';
 import { EmployeeUpdateDto } from './dtos/employeeUpdate.dto';
-// import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
-// import { PermissionsGuard } from 'src/auth/guards/permission.guard';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import { PermissionsGuard } from 'src/auth/guards/permission.guard';
 import { RequirePermissions } from 'src/auth/decorators/permission.decorator';
 import { SoftDeleteEmployeeDto } from './dtos/SoftDeleteEmployeeDto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { join } from 'path';
 
 @ApiTags('Employees')
-// @ApiBearerAuth()
-// @UseGuards(JwtAuthGuard, PermissionsGuard)
+@ApiBearerAuth()
+@UseGuards(JwtAuthGuard, PermissionsGuard)
 @Controller('employees')
 export class EmployeesController {
   constructor(private readonly employeesService: EmployeesService) {}
@@ -67,6 +67,13 @@ export class EmployeesController {
     );
   }
 
+  @Get('employee_image/:filename')
+  @RequirePermissions('download:imagefile')
+  getEmployeeImage(@Param('filename') filename: string, @Res() res: Response) {
+    const filePath = join(process.cwd(), 'uploads', filename);
+    return res.download(filePath);
+  }
+
   @Get()
   @RequirePermissions('read:employee')
   @ApiOperation({ summary: 'Get all employees' })
@@ -84,12 +91,6 @@ export class EmployeesController {
   })
   async getSoftDeletedData() {
     return await this.employeesService.getDeletedData();
-  }
-
-  @Get('employee_image/:filename')
-  getEmployeeImage(@Param('filename') filename: string, @Res() res: Response) {
-    const filePath = join(process.cwd(), 'uploads', filename);
-    return res.download(filePath);
   }
 
   @Get(':id')

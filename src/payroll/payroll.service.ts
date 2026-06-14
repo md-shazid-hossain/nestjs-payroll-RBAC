@@ -11,6 +11,7 @@ import {
 import { SalaryStructure } from 'src/salary-structure/salary-structure.entity';
 import { Attendance, AttendanceStatus } from 'src/attendance/attendance.entity';
 import { Tax } from 'src/tax/tax.entity';
+import { Holiday } from 'src/holiday/holiday.entity';
 
 @Injectable()
 export class PayrollService {
@@ -26,6 +27,9 @@ export class PayrollService {
 
     @InjectRepository(Tax)
     private taxRepository: Repository<Tax>,
+
+    @InjectRepository(Holiday)
+    private holidayRepository: Repository<Holiday>,
   ) {}
 
   async createPayroll(id: number, month: number) {
@@ -42,7 +46,7 @@ export class PayrollService {
       },
     });
 
-    console.log('present day', totalPresentDay);
+    // console.log('present day', totalPresentDay);
 
     //! total late day count in a month
     const totalLateDay = await this.attendenceRepository.count({
@@ -170,5 +174,142 @@ export class PayrollService {
     });
 
     return salaryByMonth;
+  }
+
+  //! payroll Record --------------------------------------------------------->
+  async payrollRecord(employee_id: number, month: number) {
+    const payrollData = await this.payrollRepository.find({
+      where: { employee: { id: employee_id }, month: month },
+      relations: { employee: { department_id: true } },
+      select: {
+        employee: {
+          name: true,
+          email: true,
+          phone: true,
+          designation: true,
+          department_id: {
+            name: true,
+          },
+        },
+        month: true,
+        gross: true,
+        deduction: true,
+        taxDeduction: true,
+        status: true,
+        net: true,
+      },
+    });
+
+    //! calculating without weekend
+    function getWeekdaysInMonth(year: number, month: number): Date[] {
+      const weekdays: Date[] = [];
+      const date = new Date(year, month, 1);
+
+      while (date.getMonth() === month) {
+        const dayOfWeek = date.getDay();
+
+        //? friday and saturday is holiday
+        if (dayOfWeek !== 5 && dayOfWeek !== 6) {
+          weekdays.push(new Date(date));
+        }
+
+        date.setDate(date.getDate() + 1);
+      }
+
+      return weekdays;
+    }
+
+    const weekdays = getWeekdaysInMonth(2026, month);
+
+    const totalWeekDay = weekdays.length;
+
+    //! finding holidays
+    const startDate = new Date(2026, month, 1);
+    const endDate = new Date(2026, month + 1, 0, 23, 59, 59);
+
+    const holidays = await this.holidayRepository.count({
+      where: {
+        date: Between(startDate, endDate),
+      },
+    });
+
+    //! total working day
+    const totalWorkingDays = totalWeekDay - holidays;
+
+    //! present day
+    const presentDay = await this.attendenceRepository.count({
+      where: {
+        employee_id: {
+          id: employee_id,
+        },
+        date: Between(startDate, endDate),
+      },
+    });
+
+    const absentDay = totalWorkingDays - presentDay;
+
+    const lateDay = await this.attendenceRepository.count({
+      where: {
+        employee_id: { id: employee_id },
+        status: AttendanceStatus.LATE,
+        date: Between(startDate, endDate),
+      },
+    });
+
+    const presentDayData = await this.attendenceRepository.find({
+      where: {
+        employee_id: {
+          id: employee_id,
+        },
+        date: Between(startDate, endDate),
+      },
+      select: {
+        id: true,
+        date: true,
+        status: true,
+        checkInTime: true,
+        checkOutTime: true,
+      },
+    });
+
+    const lateDayData = await this.attendenceRepository.find({
+      where: {
+        employee_id: { id: employee_id },
+        status: AttendanceStatus.LATE,
+        date: Between(startDate, endDate),
+      },
+      select: {
+        id: true,
+        date: true,
+        status: true,
+        checkInTime: true,
+        checkOutTime: true,
+      },
+    });
+
+    const salary = await this.salaryStructure.findOne({
+      where: {
+        employee_id: {
+          id: employee_id,
+        },
+      },
+
+      select: {
+        id: true,
+        basicSalary: true,
+      },
+    });
+
+    return {
+      total_working_days: totalWorkingDays,
+      total_holidays: holidays,
+      total_present_days: presentDay,
+      total_absent_days: absentDay,
+      total_late_days: lateDay,
+      presentDayData,
+      lateDayData,
+      salary,
+      payrollData,
+    };
   }
 }

@@ -117,7 +117,7 @@ export class EmployeesService {
         presentAddress: true,
         permanentAddress: true,
         status: true,
-        salaryStructures: {
+        salaryStructure: {
           basicSalary: true,
         },
         department_id: {

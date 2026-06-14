@@ -14,7 +14,7 @@ export class StripeTable {
   @PrimaryGeneratedColumn()
   id!: number;
 
-  @OneToMany(() => Employees, (employee) => employee.salaryStructures, {
+  @OneToMany(() => Employees, (employee) => employee.salaryStructure, {
     nullable: false,
   })
   @JoinColumn({ name: 'employee_id' })

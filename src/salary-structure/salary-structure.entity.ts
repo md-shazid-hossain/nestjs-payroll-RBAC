@@ -16,7 +16,7 @@ export class SalaryStructure {
   @PrimaryGeneratedColumn()
   id!: number;
 
-  @OneToOne(() => Employees, (employee) => employee.salaryStructures, {
+  @OneToOne(() => Employees, (employee) => employee.salaryStructure, {
     nullable: false,
   })
   @JoinColumn({ name: 'employee_id' })
