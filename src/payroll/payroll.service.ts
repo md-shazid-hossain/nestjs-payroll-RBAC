@@ -255,7 +255,7 @@ export class PayrollService {
                 	PAYROLL."month" DESC
                 LIMIT
                 	1;
-`);
+    `);
 
     const datas = {
       ...payrollQuery[0],
