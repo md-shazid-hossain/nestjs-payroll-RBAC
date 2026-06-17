@@ -178,28 +178,6 @@ export class PayrollService {
 
   //! payroll Record --------------------------------------------------------->
   async payrollRecord(employee_id: number, month: number) {
-    const payrollData = await this.payrollRepository.find({
-      where: { employee: { id: employee_id }, month: month },
-      relations: { employee: { department_id: true } },
-      select: {
-        employee: {
-          name: true,
-          email: true,
-          phone: true,
-          designation: true,
-          department_id: {
-            name: true,
-          },
-        },
-        month: true,
-        gross: true,
-        deduction: true,
-        taxDeduction: true,
-        status: true,
-        net: true,
-      },
-    });
-
     //! calculating without weekend
     function getWeekdaysInMonth(year: number, month: number): Date[] {
       const weekdays: Date[] = [];
@@ -256,60 +234,38 @@ export class PayrollService {
       },
     });
 
-    const presentDayData = await this.attendenceRepository.find({
-      where: {
-        employee_id: {
-          id: employee_id,
-        },
-        date: Between(startDate, endDate),
-      },
-      select: {
-        id: true,
-        date: true,
-        status: true,
-        checkInTime: true,
-        checkOutTime: true,
-      },
-    });
+    const payrollQuery = await this.payrollRepository.query<Payroll[]>(`
+                SELECT
+                	PAYROLL."id",
+                	EMPLOYEES."name",
+                	EMPLOYEES."email",
+                	SALARY_STRUCTURE."basicSalary",
+                	PAYROLL."month",
+                	PAYROLL."gross",
+                	PAYROLL."taxDeduction",
+                	PAYROLL."deduction",
+                	PAYROLL."net"
+                FROM
+                	PAYROLL
+                	left JOIN EMPLOYEES ON PAYROLL."employeeId" = EMPLOYEES."id"
+                	left JOIN SALARY_STRUCTURE ON SALARY_STRUCTURE."employee_id" = PAYROLL."employeeId"
+                WHERE
+                	PAYROLL."employeeId" = ${employee_id} AND PAYROLL."month" = ${month}
+                ORDER BY
+                	PAYROLL."month" DESC
+                LIMIT
+                	1;
+`);
 
-    const lateDayData = await this.attendenceRepository.find({
-      where: {
-        employee_id: { id: employee_id },
-        status: AttendanceStatus.LATE,
-        date: Between(startDate, endDate),
-      },
-      select: {
-        id: true,
-        date: true,
-        status: true,
-        checkInTime: true,
-        checkOutTime: true,
-      },
-    });
-
-    const salary = await this.salaryStructure.findOne({
-      where: {
-        employee_id: {
-          id: employee_id,
-        },
-      },
-
-      select: {
-        id: true,
-        basicSalary: true,
-      },
-    });
-
-    return {
+    const datas = {
+      ...payrollQuery[0],
       total_working_days: totalWorkingDays,
       total_holidays: holidays,
       total_present_days: presentDay,
       total_absent_days: absentDay,
       total_late_days: lateDay,
-      presentDayData,
-      lateDayData,
-      salary,
-      payrollData,
     };
+
+    return datas;
   }
 }

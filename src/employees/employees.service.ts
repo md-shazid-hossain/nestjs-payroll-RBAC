@@ -47,7 +47,7 @@ export class EmployeesService {
     const employeeData = this.employeesRepository
       .createQueryBuilder('employee')
       .leftJoin('employee.department_id', 'department')
-      .leftJoin('employee.salaryStructures', 'salaryStructures')
+      .leftJoin('employee.salaryStructure', 'salaryStructure')
 
       .select('employee.id', 'id')
       .addSelect('employee.name', 'name')
@@ -66,7 +66,7 @@ export class EmployeesService {
       .addSelect('employee.status', 'status')
 
       .addSelect('department.name', 'department_name')
-      .addSelect('salaryStructures.basicSalary', 'basicSalary')
+      .addSelect('salaryStructure.basicSalary', 'basicSalary')
       .addSelect(
         `'http://localhost:3000/employees/employee_image/' || employee.profile_pic`,
         'image_url',
