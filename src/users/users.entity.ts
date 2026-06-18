@@ -1,9 +1,9 @@
-// import { Employees } from 'src/employees/employees.entity';
-import { Department } from 'src/department/department.entity';
-import { Employees } from 'src/employees/employees.entity';
-import { Permission } from 'src/permission/permission.entity';
-import { Role } from 'src/role/role.entity';
-import { SalaryStructure } from 'src/salary-structure/salary-structure.entity';
+// import { Employees } from '../employees/employees.entity';
+import { Department } from '../department/department.entity';
+import { Employees } from '../employees/employees.entity';
+import { Permission } from '../permission/permission.entity';
+import { Role } from '../role/role.entity';
+import { SalaryStructure } from '../salary-structure/salary-structure.entity';
 import {
   Column,
   CreateDateColumn,

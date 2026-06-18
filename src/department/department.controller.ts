@@ -20,9 +20,9 @@ import {
 import { DepartmentService } from './department.service';
 import { DepartmentDto } from './dtos/department.dto';
 import { SoftDeleteDepartmentDto } from './dtos/SoftDeleteDepartmentDto';
-import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
-import { PermissionsGuard } from 'src/auth/guards/permission.guard';
-import { RequirePermissions } from 'src/auth/decorators/permission.decorator';
+import { JwtAuthGuard } from '../../src/auth/guards/jwt-auth.guard';
+import { PermissionsGuard } from '../../src/auth/guards/permission.guard';
+import { RequirePermissions } from '../auth/decorators/permission.decorator';
 
 @ApiTags('Department')
 @ApiBearerAuth()

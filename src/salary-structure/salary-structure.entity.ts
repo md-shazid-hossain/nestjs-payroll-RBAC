@@ -9,7 +9,7 @@ import {
 } from 'typeorm';
 import { OneToOne } from 'typeorm';
 import { Employees } from '../employees/employees.entity';
-import { Users } from 'src/users/users.entity';
+import { Users } from '../users/users.entity';
 
 @Entity()
 export class SalaryStructure {

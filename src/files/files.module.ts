@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { MulterModule } from '@nestjs/platform-express';
-import { EmployeesController } from 'src/employees/employees.controller';
-import { EmployeesModule } from 'src/employees/employees.module';
+import { EmployeesController } from '../employees/employees.controller';
+import { EmployeesModule } from '../employees/employees.module';
 
 @Module({
   imports: [

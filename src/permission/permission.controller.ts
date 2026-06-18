@@ -16,7 +16,7 @@ import {
 } from '@nestjs/swagger';
 import { PermissionService } from './permission.service';
 import { CreatePermissionDto } from './dtos/createPermission.dto';
-import { SoftDeleteDepartmentDto } from 'src/department/dtos/SoftDeleteDepartmentDto';
+import { SoftDeleteDepartmentDto } from '../department/dtos/SoftDeleteDepartmentDto';
 
 @ApiTags('permission')
 @Controller('permission')

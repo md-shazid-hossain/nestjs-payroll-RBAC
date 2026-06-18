@@ -1,5 +1,5 @@
-import { Permission } from 'src/permission/permission.entity';
-import { Users } from 'src/users/users.entity';
+import { Permission } from '../permission/permission.entity';
+import { Users } from '../users/users.entity';
 import {
   Column,
   Entity,

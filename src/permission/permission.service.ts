@@ -6,7 +6,7 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { IsNull, Not, Repository } from 'typeorm';
 import { Permission } from './permission.entity';
-import { Role } from 'src/role/role.entity';
+import { Role } from '../role/role.entity';
 import { CreatePermissionDto } from './dtos/createPermission.dto';
 import { SoftDeletePermissionDto } from './dtos/softDeletePermisssion.dto';
 

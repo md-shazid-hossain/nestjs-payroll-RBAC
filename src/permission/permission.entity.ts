@@ -1,5 +1,5 @@
-import { Role } from 'src/role/role.entity';
-import { Users } from 'src/users/users.entity';
+import { Role } from '../role/role.entity';
+import { Users } from '../users/users.entity';
 import {
   Column,
   Entity,

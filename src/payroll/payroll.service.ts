@@ -8,10 +8,10 @@ import {
   MoreThanOrEqual,
   Repository,
 } from 'typeorm';
-import { SalaryStructure } from 'src/salary-structure/salary-structure.entity';
-import { Attendance, AttendanceStatus } from 'src/attendance/attendance.entity';
-import { Tax } from 'src/tax/tax.entity';
-import { Holiday } from 'src/holiday/holiday.entity';
+import { SalaryStructure } from '../salary-structure/salary-structure.entity';
+import { Attendance, AttendanceStatus } from '../attendance/attendance.entity';
+import { Tax } from '../tax/tax.entity';
+import { Holiday } from '../holiday/holiday.entity';
 
 @Injectable()
 export class PayrollService {

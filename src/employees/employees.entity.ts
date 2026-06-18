@@ -9,10 +9,10 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { Department } from '../department/department.entity';
-import { Attendance } from 'src/attendance/attendance.entity';
-import { Payroll } from 'src/payroll/payroll.entity';
-import { SalaryStructure } from 'src/salary-structure/salary-structure.entity';
-import { Users } from 'src/users/users.entity';
+import { Attendance } from '../attendance/attendance.entity';
+import { Payroll } from '../payroll/payroll.entity';
+import { SalaryStructure } from '../salary-structure/salary-structure.entity';
+import { Users } from '../users/users.entity';
 
 @Entity()
 export class Employees {

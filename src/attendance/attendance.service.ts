@@ -4,8 +4,8 @@ import { Attendance, AttendanceStatus } from './attendance.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AttendanceCreateDto } from './dtos/createAttendance.dto';
 import { ConflictException } from '@nestjs/common';
-import { Employees } from 'src/employees/employees.entity';
-import { Holiday } from 'src/holiday/holiday.entity';
+import { Employees } from '../employees/employees.entity';
+import { Holiday } from '../holiday/holiday.entity';
 
 const officeStartTime = new Date();
 officeStartTime.setHours(9, 0, 0, 0);

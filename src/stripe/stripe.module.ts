@@ -3,8 +3,8 @@ import { StripeService } from './stripe.service';
 import { StripeController } from './stripe.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { StripeTable } from './stripe.entity';
-import { Payroll } from 'src/payroll/payroll.entity';
-import { Employees } from 'src/employees/employees.entity';
+import { Payroll } from '../payroll/payroll.entity';
+import { Employees } from '../employees/employees.entity';
 import Stripe from 'stripe';
 @Module({
   imports: [TypeOrmModule.forFeature([StripeTable, Employees, Payroll])],

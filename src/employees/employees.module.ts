@@ -1,10 +1,10 @@
 import { BadRequestException, Module } from '@nestjs/common';
 import { EmployeesController } from './employees.controller';
 import { EmployeesService } from './employees.service';
-import { Department } from 'src/department/department.entity';
+import { Department } from '../department/department.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Employees } from './employees.entity';
-import { AuthModule } from 'src/auth/auth.module';
+import { AuthModule } from '../auth/auth.module';
 import { MulterModule } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname } from 'path';

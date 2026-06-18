@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Employees } from 'src/employees/employees.entity';
-import { Payroll } from 'src/payroll/payroll.entity';
+import { Employees } from '../employees/employees.entity';
+import { Payroll } from '../payroll/payroll.entity';
 import Stripe from 'stripe';
 import { Repository } from 'typeorm';
 import { StripeTable } from './stripe.entity';
