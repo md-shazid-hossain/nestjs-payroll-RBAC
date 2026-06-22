@@ -8,10 +8,11 @@ import { Attendance } from '../attendance/attendance.entity';
 import { Employees } from '../employees/employees.entity';
 import { Tax } from '../tax/tax.entity';
 import { Holiday } from '../holiday/holiday.entity';
+import { PayrollSeederService } from './payroll.seeder.service';
 
 @Module({
   controllers: [PayrollController],
-  providers: [PayrollService],
+  providers: [PayrollService, PayrollSeederService],
   imports: [
     TypeOrmModule.forFeature([
       Payroll,

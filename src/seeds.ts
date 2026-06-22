@@ -1,14 +1,30 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { DepartmentSeederService } from './department/department.seeder.service';
+import { EmployeesSeederService } from './employees/employees.seeder.service';
+import { HolidaySeederService } from './holiday/holiday.seeder.service';
+import { SalaryStructureSeederService } from './salary-structure/salary-structure.seeder.service';
+import { PayrollSeederService } from './payroll/payroll.seeder.service';
 
-async function run() {
+async function seedRunner() {
   const app = await NestFactory.createApplicationContext(AppModule);
 
-  const seeder = app.get(DepartmentSeederService);
-  await seeder.seed();
+  // const departmentSeeder = app.get(DepartmentSeederService);
+  // await departmentSeeder.seed();
+
+  // const employeeSeeder = app.get(EmployeesSeederService);
+  // await employeeSeeder.seed();
+
+  // const holidaySeeder = app.get(HolidaySeederService);
+  // await holidaySeeder.seed();
+
+  // const salaryStructureSeeder = app.get(SalaryStructureSeederService);
+  // await salaryStructureSeeder.seed();
+
+  const payrollSeeder = app.get(PayrollSeederService);
+  await payrollSeeder.seed();
 
   await app.close();
 }
 
-run();
+seedRunner();

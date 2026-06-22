@@ -166,7 +166,6 @@ export class Employees {
     nullable: true,
     type: 'varchar',
     length: 1000,
-    unique: true,
   })
   profile_pic!: string;
 

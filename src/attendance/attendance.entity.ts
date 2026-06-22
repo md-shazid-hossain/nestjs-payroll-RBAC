@@ -28,7 +28,7 @@ export class Attendance {
   })
   status!: AttendanceStatus;
 
-  @Column({ type: 'timestamp', nullable: true })
+  @Column({ type: 'timestamp', nullable: false })
   checkInTime?: Date;
 
   @Column({ type: 'timestamp', nullable: true })

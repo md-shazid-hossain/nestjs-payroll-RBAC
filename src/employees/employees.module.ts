@@ -8,10 +8,11 @@ import { AuthModule } from '../auth/auth.module';
 import { MulterModule } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
+import { EmployeesSeederService } from './employees.seeder.service';
 
 @Module({
   controllers: [EmployeesController],
-  providers: [EmployeesService],
+  providers: [EmployeesService, EmployeesSeederService],
   imports: [
     MulterModule.register({
       storage: diskStorage({
