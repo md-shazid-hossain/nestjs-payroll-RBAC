@@ -71,6 +71,7 @@ export class EmployeesService {
         `'http://localhost:3000/employees/employee_image/' || employee.profile_pic`,
         'image_url',
       )
+      .orderBy('employee.id', 'ASC')
 
       .getRawMany();
 

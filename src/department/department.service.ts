@@ -36,16 +36,14 @@ export class DepartmentService {
   async getAllDepartments() {
     return this.departmentRepository.find({
       where: { deleteDate: IsNull() },
-      order: { id: 'DESC' },
-      select: { name: true, id: true, employees: true },
-      relations: ['employees'],
+      order: { id: 'ASC' },
+      select: { name: true, id: true },
     });
   }
 
   async getDepartmentById(id: number) {
     return this.departmentRepository.findOne({
       where: { id },
-      order: { id: 'DESC' },
       select: { name: true, id: true },
     });
   }

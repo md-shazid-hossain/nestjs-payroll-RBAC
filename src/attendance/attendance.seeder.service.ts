@@ -24,7 +24,9 @@ export class AttendanceSeederService {
     }
 
     const attendanceRecords: Attendance[] = [];
-    const daysToSeed = 30;
+
+    // Changed to 365 for a full year of history
+    const daysToSeed = 365;
 
     for (const employee of employees) {
       for (let i = 0; i < daysToSeed; i++) {
@@ -80,7 +82,8 @@ export class AttendanceSeederService {
       }
     }
 
-    // Batch save to prevent database memory overload with thousands of rows
+    // Batch save is especially important here since 1 year for 100 employees
+    // generates roughly 26,000 records. Chunking handles this perfectly.
     const chunkSize = 1000;
     for (let i = 0; i < attendanceRecords.length; i += chunkSize) {
       await this.attendanceRepo.save(attendanceRecords.slice(i, i + chunkSize));

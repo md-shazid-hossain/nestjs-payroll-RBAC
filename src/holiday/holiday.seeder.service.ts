@@ -14,7 +14,7 @@ export class HolidaySeederService {
   async seed() {
     const holidays: Holiday[] = [];
 
-    for (let i = 0; i < 100; i++) {
+    for (let i = 0; i < 50; i++) {
       const randomDate = faker.date.between({
         from: '2026-01-01',
         to: '2026-12-31',

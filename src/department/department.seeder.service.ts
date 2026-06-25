@@ -14,7 +14,7 @@ export class DepartmentSeederService {
   async seed() {
     const departments: Department[] = [];
 
-    for (let i = 0; i < 100; i++) {
+    for (let i = 0; i < 50; i++) {
       departments.push(
         this.departmentRepo.create({
           name:

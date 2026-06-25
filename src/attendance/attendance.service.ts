@@ -90,6 +90,7 @@ export class AttendanceService {
         'employee.id',
       ])
       .orderBy('attendance.id', 'DESC')
+      .limit(1000)
       .getMany();
   }
 
